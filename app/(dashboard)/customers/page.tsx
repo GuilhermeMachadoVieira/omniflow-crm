@@ -1,51 +1,17 @@
-"use client";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { getCustomers } from "@/app/actions/customers";
+import { CustomerSafe } from "@/lib/frontend-types";
+import { CustomersClient } from "@/components/customers/CustomersClient";
 
-import { useState, useMemo, useCallback } from "react";
-import { DataTable } from "@/components/customers/data-table";
-import { getColumns } from "@/components/customers/columns";
-import { CustomerDetailSheet } from "@/components/customers/customer-detail-sheet";
-import { MOCK_CUSTOMERS } from "@/lib/mock/customers";
-import type { Customer } from "@/lib/mock/customers";
+export default async function CustomersPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
 
-export default function CustomersPage() {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
-  const [sheetOpen, setSheetOpen] = useState(false);
+  // Buscar dados no servidor (já sanitizados)
+  const customers = await getCustomers();
 
-  const handleViewDetails = useCallback((customer: Customer) => {
-    setSelectedCustomer(customer);
-    setSheetOpen(true);
-  }, []);
-
-  const columns = useMemo(
-    () => getColumns(handleViewDetails),
-    [handleViewDetails]
-  );
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Gestão de Clientes
-        </h1>
-        <p className="text-muted-foreground">
-          Consulte e gerencie seus clientes. Clique em uma linha ou em &quot;Ver
-          Detalhes&quot; para abrir o perfil.
-        </p>
-      </div>
-
-      <DataTable
-        data={MOCK_CUSTOMERS}
-        columns={columns}
-        onRowClick={handleViewDetails}
-      />
-
-      <CustomerDetailSheet
-        customer={selectedCustomer}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
-    </div>
-  );
+  return <CustomersClient initialCustomers={customers} />;
 }

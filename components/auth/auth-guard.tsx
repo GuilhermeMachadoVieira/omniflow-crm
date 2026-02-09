@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { hasAuthCookie } from "@/lib/auth";
 
 const LOGIN_PATH = "/login";
 
@@ -11,18 +10,23 @@ interface AuthGuardProps {
 }
 
 /**
- * Protege rotas privadas no cliente: se o cookie de auth não existir
- * (ex.: usuário apagou após carregar a página), redireciona para o login.
- * A proteção principal é feita pelo middleware; este componente evita
- * uso indevido após carregamento.
+ * Proteção simples de rotas no cliente.
+ * A proteção principal é feita pelo middleware.
  */
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    // Verificação simples de cookie
     if (pathname === LOGIN_PATH) return;
-    if (!hasAuthCookie()) {
+    
+    const hasCookie = document.cookie.includes("omniflow-auth=");
+    console.log("AuthGuard - pathname:", pathname, "hasCookie:", hasCookie);
+    console.log("AuthGuard - all cookies:", document.cookie);
+    
+    if (!hasCookie) {
+      console.log("AuthGuard - Redirecting to login");
       router.replace(LOGIN_PATH);
     }
   }, [pathname, router]);

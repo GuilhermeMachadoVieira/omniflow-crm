@@ -9,44 +9,56 @@ import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginAction } from "@/app/actions/auth";
+import { registerAction } from "@/app/actions/register";
 import { Loader2 } from "lucide-react";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Informe um e-mail válido"),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+  empresa: z.string().min(2, "Nome da empresa deve ter pelo menos 2 caracteres"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { 
+      nome: "", 
+      email: "", 
+      password: "", 
+      empresa: "" 
+    },
   });
 
-  async function onSubmit(data: LoginFormData) {
+  async function onSubmit(data: RegisterFormData) {
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     try {
-      const result = await loginAction(data);
+      const result = await registerAction(data);
       if (result.success) {
-        router.push("/");
-        router.refresh();
+        setSuccess("Conta criada com sucesso! Redirecionando...");
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 1500);
       } else {
-        setError(result.error || "Erro ao fazer login");
+        setError(result.error || "Erro ao criar conta");
       }
     } catch (error) {
-      setError("Erro ao fazer login");
+      setError("Erro ao criar conta");
     } finally {
       setIsLoading(false);
     }
@@ -63,12 +75,12 @@ export default function LoginPage() {
         </div>
         <div className="relative z-10 flex flex-1 items-center">
           <blockquote className="text-lg leading-relaxed text-zinc-300 md:text-xl">
-            &ldquo;Vendas não são sobre falar. São sobre escutar, entender e
-            entregar valor no momento certo.&rdquo;
+            &ldquo;Comece sua jornada de vendas hoje. Crie sua conta,
+            monte sua equipe e transforme leads em clientes fiéis.&rdquo;
           </blockquote>
         </div>
         <p className="relative z-10 text-sm text-zinc-500">
-          OmniFlow CRM · Gestão de relacionamento e vendas complexas
+          OmniFlow CRM · Sua plataforma de gestão completa
         </p>
       </div>
 
@@ -77,10 +89,10 @@ export default function LoginPage() {
         <div className="w-full max-w-sm space-y-8">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">
-              Acesse sua conta
+              Criar nova conta
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Use seu e-mail e senha para entrar.
+              Crie sua conta e organização para começar a usar o OmniFlow.
             </p>
           </div>
 
@@ -90,13 +102,35 @@ export default function LoginPage() {
             </div>
           )}
 
+          {success && (
+            <div className="rounded-md border border-green-200 bg-green-50 p-3">
+              <p className="text-sm text-green-800">{success}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome completo</Label>
+              <Input
+                id="nome"
+                placeholder="João Silva"
+                disabled={isLoading}
+                {...register("nome")}
+                className={errors.nome ? "border-destructive" : ""}
+              />
+              {errors.nome && (
+                <p className="text-sm text-destructive">
+                  {errors.nome.message}
+                </p>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder="joao@exemplo.com"
                 autoComplete="email"
                 disabled={isLoading}
                 {...register("email")}
@@ -110,12 +144,28 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="empresa">Nome da empresa</Label>
+              <Input
+                id="empresa"
+                placeholder="Minha Startup Ltda"
+                disabled={isLoading}
+                {...register("empresa")}
+                className={errors.empresa ? "border-destructive" : ""}
+              />
+              {errors.empresa && (
+                <p className="text-sm text-destructive">
+                  {errors.empresa.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 disabled={isLoading}
                 {...register("password")}
                 className={errors.password ? "border-destructive" : ""}
@@ -135,31 +185,23 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Entrando...
+                  Criando conta...
                 </>
               ) : (
-                "Entrar"
+                "Criar conta"
               )}
             </Button>
           </form>
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Não tem conta?{" "}
+              Já tem conta?{" "}
               <a 
-                href="/register" 
+                href="/login" 
                 className="font-medium text-primary hover:underline"
               >
-                Crie sua empresa agora
+                Faça login
               </a>
-            </p>
-          </div>
-
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              <strong>Demo:</strong><br />
-              Admin: admin@omniflow.com / admin123<br />
-              Vendedor: vendedor@omniflow.com / vendedor123
             </p>
           </div>
         </div>

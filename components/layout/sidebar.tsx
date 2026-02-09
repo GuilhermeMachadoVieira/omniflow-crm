@@ -13,7 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { clearAuthCookie } from "@/lib/auth";
+import { logoutAction } from "@/app/actions/auth";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -22,18 +23,28 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { href: "/configuracoes", label: "Configurações", icon: Settings },
+  { href: "/settings", label: "Configurações", icon: Settings, requiredRole: "ADMIN" as const },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user } = useCurrentUser();
 
-  function handleLogout() {
-    clearAuthCookie();
+  async function handleLogout() {
+    await logoutAction();
     router.push("/login");
     router.refresh();
   }
+
+  // Verificar se o usuário tem permissão para ver o item
+  const canViewItem = (item: typeof bottomItems[0]) => {
+    if (!item.requiredRole) return true;
+    if (!user) return false;
+    
+    // OWNER e ADMIN podem ver tudo
+    return user.role === "OWNER" || user.role === "ADMIN";
+  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-border bg-card shadow-sm">
@@ -64,7 +75,7 @@ export function Sidebar() {
       </nav>
       <Separator />
       <nav className="p-3">
-        {bottomItems.map((item) => {
+        {bottomItems.filter(canViewItem).map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
@@ -83,14 +94,16 @@ export function Sidebar() {
             </Link>
           );
         })}
-        <Button
-          variant="ghost"
-          className="mt-1 w-full justify-start gap-3 text-muted-foreground hover:bg-muted hover:text-foreground"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          Sair
-        </Button>
+        <form action={handleLogout}>
+          <Button
+            type="submit"
+            variant="ghost"
+            className="mt-1 w-full justify-start gap-3 text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <LogOut className="h-5 w-5 shrink-0" />
+            Sair
+          </Button>
+        </form>
       </nav>
     </aside>
   );

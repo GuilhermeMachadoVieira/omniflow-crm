@@ -2,19 +2,19 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import type { PipelineOpportunity, Priority } from "@/lib/mock/pipeline";
+import { OpportunitySafe } from "@/lib/frontend-types";
 import { cn } from "@/lib/utils";
 
-const PRIORITY_LABELS: Record<Priority, string> = {
-  high: "Alta",
-  medium: "Média",
-  low: "Baixa",
+const PRIORITY_LABELS: Record<string, string> = {
+  HIGH: "Alta",
+  MEDIUM: "Média",
+  LOW: "Baixa",
 };
 
-const PRIORITY_STYLES: Record<Priority, string> = {
-  high: "bg-destructive/10 text-destructive border border-destructive/20",
-  medium: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20",
-  low: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
+const PRIORITY_STYLES: Record<string, string> = {
+  HIGH: "bg-destructive/10 text-destructive border border-destructive/20",
+  MEDIUM: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20",
+  LOW: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
 };
 
 function formatCurrency(value: number) {
@@ -25,13 +25,13 @@ function formatCurrency(value: number) {
 }
 
 /** Card content only – used in DragOverlay so the preview is always visible */
-export function BoardCardPreview({ opportunity }: { opportunity: PipelineOpportunity }) {
+export function BoardCardPreview({ opportunity }: { opportunity: OpportunitySafe }) {
   return (
     <Card className="shadow-lg ring-2 ring-primary/20 cursor-grabbing">
       <CardHeader className="p-4 pb-1">
         <div className="flex items-start justify-between gap-2">
           <p className="font-medium text-sm leading-tight line-clamp-2">
-            {opportunity.companyName}
+            {opportunity.title}
           </p>
           <span
             className={cn(
@@ -45,7 +45,7 @@ export function BoardCardPreview({ opportunity }: { opportunity: PipelineOpportu
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <p className="text-lg font-semibold text-primary">
-          {formatCurrency(opportunity.value)}
+          {formatCurrency(Number(opportunity.value))}
         </p>
       </CardContent>
     </Card>
@@ -53,7 +53,7 @@ export function BoardCardPreview({ opportunity }: { opportunity: PipelineOpportu
 }
 
 interface BoardCardProps {
-  opportunity: PipelineOpportunity;
+  opportunity: OpportunitySafe;
 }
 
 export function BoardCard({ opportunity }: BoardCardProps) {
@@ -88,7 +88,7 @@ export function BoardCard({ opportunity }: BoardCardProps) {
       <CardHeader className="p-4 pb-1">
         <div className="flex items-start justify-between gap-2">
           <p className="font-medium text-sm leading-tight line-clamp-2">
-            {opportunity.companyName}
+            {opportunity.title}
           </p>
           <span
             className={cn(
@@ -102,7 +102,7 @@ export function BoardCard({ opportunity }: BoardCardProps) {
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <p className="text-lg font-semibold text-primary">
-          {formatCurrency(opportunity.value)}
+          {formatCurrency(Number(opportunity.value))}
         </p>
       </CardContent>
     </Card>

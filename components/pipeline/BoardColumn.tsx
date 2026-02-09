@@ -2,23 +2,28 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import { BoardCard } from "./BoardCard";
-import type { PipelineOpportunity, PipelineStage } from "@/lib/mock/pipeline";
+import { OpportunitySafe } from "@/lib/frontend-types";
 import { cn } from "@/lib/utils";
 
 interface BoardColumnProps {
-  stageId: PipelineStage;
+  stageId: string;
   title: string;
-  opportunities: PipelineOpportunity[];
+  opportunities: OpportunitySafe[];
+  total?: number;
 }
 
 export function BoardColumn({
   stageId,
   title,
   opportunities,
+  total,
 }: BoardColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: stageId,
   });
+
+  // Calcular total se não for fornecido
+  const columnTotal = total ?? opportunities.reduce((sum, opp) => sum + Number(opp.value), 0);
 
   return (
     <div
@@ -28,17 +33,30 @@ export function BoardColumn({
         isOver && "bg-muted ring-2 ring-primary/30"
       )}
     >
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-semibold text-sm text-foreground">{title}</h3>
-        <span className="rounded-full bg-muted-foreground/20 px-2 py-0.5 text-xs text-muted-foreground">
-          {opportunities.length}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-medium text-sm text-foreground">{title}</h3>
+        <span className="text-sm font-semibold text-primary">
+          {formatCurrency(columnTotal)}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
-        {opportunities.map((opp) => (
-          <BoardCard key={opp.id} opportunity={opp} />
-        ))}
+      <div className="flex-1 space-y-2">
+        {opportunities.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            Nenhuma oportunidade
+          </div>
+        ) : (
+          opportunities.map((opportunity) => (
+            <BoardCard key={opportunity.id} opportunity={opportunity} />
+          ))
+        )}
       </div>
     </div>
   );
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
 }

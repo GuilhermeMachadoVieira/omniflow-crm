@@ -1,109 +1,22 @@
-"use client";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { getPipelineData } from "@/app/actions/pipeline";
+import { getCustomers } from "@/app/actions/customers";
+import { PipelineColumnSafe } from "@/lib/frontend-types";
+import { CustomerSafe } from "@/lib/frontend-types";
+import { PipelineClient } from "@/components/pipeline/PipelineClient";
 
-import { useState, useCallback } from "react";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragStartEvent,
-} from "@dnd-kit/core";
-import { BoardColumn } from "@/components/pipeline/BoardColumn";
-import { BoardCardPreview } from "@/components/pipeline/BoardCard";
-import {
-  PIPELINE_STAGES,
-  MOCK_OPPORTUNITIES,
-  type PipelineOpportunity,
-  type PipelineStage,
-} from "@/lib/mock/pipeline";
+export default async function PipelinePage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
 
-function getOpportunitiesByStage(
-  opportunities: PipelineOpportunity[],
-  stage: PipelineStage
-) {
-  return opportunities.filter((opp) => opp.stage === stage);
-}
+  // Buscar dados no servidor (já sanitizados)
+  const [columns, customers] = await Promise.all([
+    getPipelineData(),
+    getCustomers(),
+  ]);
 
-export default function PipelinePage() {
-  const [opportunities, setOpportunities] =
-    useState<PipelineOpportunity[]>(MOCK_OPPORTUNITIES);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(String(event.active.id));
-  }, []);
-
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
-
-    if (!over?.id) return;
-
-    const newStage = over.id as PipelineStage;
-    const validStages: PipelineStage[] = [
-      "new",
-      "qualified",
-      "proposal",
-      "negotiation",
-      "won",
-    ];
-    if (!validStages.includes(newStage)) return;
-
-    const opportunityId = String(active.id);
-    setOpportunities((prev) =>
-      prev.map((opp) =>
-        opp.id === opportunityId ? { ...opp, stage: newStage } : opp
-      )
-    );
-  }, []);
-
-  const activeOpportunity = activeId
-    ? opportunities.find((o) => o.id === activeId)
-    : null;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
-        <p className="text-muted-foreground">
-          Arraste os cards entre as colunas para atualizar o estágio do negócio.
-        </p>
-      </div>
-
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {PIPELINE_STAGES.map(({ id, label }) => (
-            <BoardColumn
-              key={id}
-              stageId={id}
-              title={label}
-              opportunities={getOpportunitiesByStage(opportunities, id)}
-            />
-          ))}
-        </div>
-
-        <DragOverlay>
-          {activeOpportunity ? (
-            <div className="w-64 rotate-2 scale-105">
-              <BoardCardPreview opportunity={activeOpportunity} />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-    </div>
-  );
+  return <PipelineClient initialColumns={columns} initialCustomers={customers} />;
 }

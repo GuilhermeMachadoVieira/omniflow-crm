@@ -1,22 +1,42 @@
-/** Nome do cookie usado para simular autenticação (fake auth). */
-export const AUTH_COOKIE_NAME = "omniflow-auth";
+import { cookies } from "next/headers";
+import { AUTH_COOKIE_NAME, AuthUser, Role } from "@/lib/types";
 
-export const AUTH_COOKIE_VALUE = "true";
+/** Obtém o usuário atual no Server Side a partir do cookie. */
+export async function getCurrentUser(): Promise<AuthUser | null> {
+  try {
+    const cookieStore = await cookies();
+    const authCookie = cookieStore.get(AUTH_COOKIE_NAME);
+    
+    if (!authCookie?.value) {
+      return null;
+    }
 
-/** Define o cookie de auth no cliente (após login fake). */
-export function setAuthCookie(): void {
-  if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE_NAME}=${AUTH_COOKIE_VALUE}; path=/; max-age=31536000; SameSite=Lax`;
+    const user = JSON.parse(authCookie.value) as AuthUser;
+    return user;
+  } catch (error) {
+    console.error("Error parsing auth cookie:", error);
+    return null;
+  }
 }
 
-/** Remove o cookie de auth no cliente (logout). */
-export function clearAuthCookie(): void {
-  if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE_NAME}=; path=/; max-age=0`;
+/** Verifica se o usuário atual tem permissão (RBAC). */
+export async function hasRole(requiredRole: Role): Promise<boolean> {
+  const user = await getCurrentUser();
+  if (!user) return false;
+
+  const roleHierarchy = {
+    OWNER: 3,
+    ADMIN: 2,
+    MEMBER: 1,
+  };
+
+  const userLevel = roleHierarchy[user.role] || 0;
+  const requiredLevel = roleHierarchy[requiredRole];
+
+  return userLevel >= requiredLevel;
 }
 
-/** Verifica no cliente se o cookie de auth existe. */
-export function hasAuthCookie(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie.includes(`${AUTH_COOKIE_NAME}=${AUTH_COOKIE_VALUE}`);
+/** Verifica se o usuário atual pode gerenciar equipe (OWNER ou ADMIN). */
+export async function canManageTeam(): Promise<boolean> {
+  return await hasRole('ADMIN');
 }
