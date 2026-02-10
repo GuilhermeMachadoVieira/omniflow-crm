@@ -49,7 +49,7 @@ export function FilterSelect({
         >
           Todos
         </DropdownMenuItem>
-        {options.map((option) => (
+        {options.map((option: { value: string; label: string }) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => {

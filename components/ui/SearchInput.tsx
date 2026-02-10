@@ -19,15 +19,6 @@ export function SearchInput({ placeholder = "Buscar...", className }: SearchInpu
   const [inputValue, setInputValue] = useState(searchParams.get("q") || "");
   const [debouncedValue, setDebouncedValue] = useState("");
 
-  // Função de debounce
-  const debounce = useCallback((func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  }, []);
-
   // Função para atualizar a URL
   const updateSearch = useCallback((query: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -44,10 +35,13 @@ export function SearchInput({ placeholder = "Buscar...", className }: SearchInpu
 
   // Debounce function
   const debouncedUpdateSearch = useCallback(
-    debounce((query: string) => {
-      setDebouncedValue(query);
-      updateSearch(query);
-    }, 300),
+    (query: string) => {
+      const timeoutId = setTimeout(() => {
+        setDebouncedValue(query);
+        updateSearch(query);
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    },
     [updateSearch]
   );
 
@@ -59,7 +53,8 @@ export function SearchInput({ placeholder = "Buscar...", className }: SearchInpu
 
   // Aplicar debounce quando o input mudar
   useEffect(() => {
-    debouncedUpdateSearch(inputValue);
+    const cleanup = debouncedUpdateSearch(inputValue);
+    return cleanup;
   }, [inputValue, debouncedUpdateSearch]);
 
   return (

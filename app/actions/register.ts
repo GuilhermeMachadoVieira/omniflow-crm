@@ -75,7 +75,7 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
     ];
 
     await prisma.pipelineColumn.createMany({
-      data: DEFAULT_COLUMNS.map(col => ({
+      data: DEFAULT_COLUMNS.map((col: any) => ({
         ...col,
         organizationId: organization.id,
       })),

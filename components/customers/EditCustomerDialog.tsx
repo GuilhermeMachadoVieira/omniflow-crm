@@ -53,7 +53,7 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
         document: formData.document || undefined,
         address: formData.address || undefined,
         source: formData.source || undefined,
-        tags: formData.tags ? formData.tags.split(",").map(tag => tag.trim()).filter(Boolean) : [],
+        tags: formData.tags ? formData.tags.split(",").map((tag: string) => tag.trim()).filter(Boolean) : [],
         notes: formData.notes || undefined,
       });
 

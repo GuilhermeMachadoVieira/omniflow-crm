@@ -27,7 +27,7 @@ export function Sidebar() {
   const getInitials = (name: string) => {
     return name
       .split(" ")
-      .map((word) => word[0])
+      .map((word: string) => word[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);

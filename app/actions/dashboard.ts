@@ -84,9 +84,9 @@ export async function getDashboardMetrics() {
         _sum: {
           value: true,
         },
-      }).then(groups => {
+      }).then((groups: any) => {
         // Agrupar por mês e calcular totais
-        const monthlyData = groups.map(group => ({
+        const monthlyData = groups.map((group: any) => ({
           month: new Date(group.createdAt).toLocaleDateString('pt-BR', { month: 'short' }),
           revenue: Number(group._sum.value || 0),
         }));

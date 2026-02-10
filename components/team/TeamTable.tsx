@@ -44,7 +44,7 @@ export function TeamTable({ members }: TeamTableProps) {
   function getInitials(nome: string) {
     return nome
       .split(" ")
-      .map((word) => word[0])
+      .map((word: string) => word[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
