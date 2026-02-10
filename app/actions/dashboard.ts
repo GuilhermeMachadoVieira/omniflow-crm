@@ -56,13 +56,13 @@ export async function getDashboardMetrics() {
         orderBy: {
           sortOrder: "desc",
         },
-      }).then(columns => {
+      }).then((columns: any) => {
         // Encontrar a última coluna (maior sortOrder)
         const lastColumn = columns[0];
         if (!lastColumn) return [];
         
         // Retornar oportunidades da última coluna como "vendas"
-        return lastColumn.opportunities.map(opp => ({
+        return lastColumn.opportunities.map((opp: any) => ({
           id: opp.id,
           title: opp.title,
           value: Number(opp.value),
@@ -96,7 +96,7 @@ export async function getDashboardMetrics() {
     ]);
 
     // Calcular receita total (soma de oportunidades na última coluna)
-    const totalRevenue = recentSales.reduce((sum, sale) => sum + sale.value, 0);
+    const totalRevenue = recentSales.reduce((sum: any, sale: any) => sum + sale.value, 0);
 
     return {
       totalRevenue,
