@@ -16,12 +16,12 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { getCustomers } from "@/app/actions/customers";
 
 interface CustomersClientProps {
-  initialCustomers: CustomerSafe[];
+  initialCustomers?: CustomerSafe[];
   searchQuery?: string;
 }
 
 export function CustomersClient({ initialCustomers, searchQuery }: CustomersClientProps) {
-  const [customers, setCustomers] = useState<CustomerSafe[]>(initialCustomers);
+  const [customers, setCustomers] = useState<CustomerSafe[]>(initialCustomers || []);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
   const [filters, setFilters] = useState({ search: searchQuery || "" });
   const [isLoading, setIsLoading] = useState(false);
