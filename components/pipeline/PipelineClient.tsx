@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PipelineBoard } from "@/components/pipeline/PipelineBoard";
 import { CreateOpportunityDialog } from "@/components/pipeline/CreateOpportunityDialog";
 import { Button } from "@/components/ui/button";
@@ -9,19 +9,45 @@ import { Plus } from "lucide-react";
 import { PipelineColumnSafe } from "@/lib/frontend-types";
 import { CustomerSafe } from "@/lib/frontend-types";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getPipelineData } from "@/app/actions/pipeline";
+import { getCustomers } from "@/app/actions/customers";
 
 interface PipelineClientProps {
-  initialColumns: PipelineColumnSafe[];
-  initialCustomers: CustomerSafe[];
+  initialColumns?: PipelineColumnSafe[];
+  initialCustomers?: CustomerSafe[];
   searchQuery?: string;
   priorityFilter?: string;
 }
 
 export function PipelineClient({ initialColumns, initialCustomers, searchQuery, priorityFilter }: PipelineClientProps) {
-  const [columns, setColumns] = useState<PipelineColumnSafe[]>(initialColumns);
-  const [customers] = useState<CustomerSafe[]>(initialCustomers);
+  const [columns, setColumns] = useState<PipelineColumnSafe[]>(initialColumns || []);
+  const [customers, setCustomers] = useState<CustomerSafe[]>(initialCustomers || []);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!initialColumns || !initialCustomers) {
+        setIsLoading(true);
+        try {
+          const [columnsData, customersData] = await Promise.all([
+            getPipelineData("", searchQuery, priorityFilter),
+            getCustomers("")
+          ]);
+          
+          if (columnsData) setColumns(columnsData);
+          if (customersData) setCustomers(customersData);
+        } catch (error) {
+          console.error("Failed to load pipeline data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadData();
+  }, [searchQuery, priorityFilter]);
 
   const handleCreateComplete = () => {
     // A lista será atualizada pelo router.refresh() no dialog
