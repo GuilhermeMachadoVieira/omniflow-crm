@@ -4,12 +4,13 @@
 export const AUTH_COOKIE_NAME = "omniflow-auth";
 
 export interface AuthUser {
-  userId: string;
+  id: string;
   organizationId: string;
   role: "OWNER" | "ADMIN" | "MEMBER";
   orgName: string;
   nome: string;
   email: string;
+  image?: string | null;
 }
 
 export type Role = "OWNER" | "ADMIN" | "MEMBER";

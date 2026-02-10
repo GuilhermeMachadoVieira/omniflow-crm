@@ -5,7 +5,9 @@ import { OverviewCard } from "@/components/dashboard/Overview";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { RecentSales } from "@/components/dashboard/RecentSales";
 import { getDashboardMetrics } from "@/app/actions/dashboard";
-import { User } from "lucide-react";
+import { User, Plus, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -18,13 +20,31 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Dashboard
-        </h1>
-        <p className="text-muted-foreground">
-          Visão geral do seu pipeline e desempenho de vendas.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground">
+            Visão geral do seu pipeline e desempenho de vendas.
+          </p>
+        </div>
+        
+        {/* Quick Actions */}
+        <div className="flex gap-2">
+          <Link href="/customers">
+            <Button variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Cliente
+            </Button>
+          </Link>
+          <Link href="/pipeline">
+            <Button>
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Nova Oportunidade
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Cards de Métricas */}

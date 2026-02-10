@@ -4,14 +4,21 @@ import { getCustomers } from "@/app/actions/customers";
 import { CustomerSafe } from "@/lib/frontend-types";
 import { CustomersClient } from "@/components/customers/CustomersClient";
 
-export default async function CustomersPage() {
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
   }
 
-  // Buscar dados no servidor (já sanitizados)
-  const customers = await getCustomers();
+  // Extrair termo de busca dos searchParams
+  const { q: searchQuery } = await searchParams;
 
-  return <CustomersClient initialCustomers={customers} />;
+  // Buscar dados no servidor (já sanitizados) com filtro de busca
+  const customers = await getCustomers(user.organizationId, searchQuery);
+
+  return <CustomersClient initialCustomers={customers} searchQuery={searchQuery} />;
 }

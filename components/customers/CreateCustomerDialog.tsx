@@ -26,6 +26,11 @@ const customerSchema = z.object({
   email: z.string().email("E-mail inválido"),
   telefone: z.string().transform(val => val || ""),
   empresa: z.string().transform(val => val || ""),
+  document: z.string().transform(val => val || ""),
+  address: z.string().transform(val => val || ""),
+  source: z.string().transform(val => val || ""),
+  tags: z.array(z.string()).transform(val => val || []),
+  notes: z.string().transform(val => val || ""),
 });
 
 type CustomerFormData = z.infer<typeof customerSchema>;
@@ -47,6 +52,11 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
       email: "",
       telefone: "",
       empresa: "",
+      document: "",
+      address: "",
+      source: "",
+      tags: [],
+      notes: "",
     },
   });
 
@@ -143,6 +153,74 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               {form.formState.errors.empresa && (
                 <p className="col-span-4 text-sm text-red-600">
                   {form.formState.errors.empresa.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="document" className="text-right">
+                Documento
+              </Label>
+              <Input
+                id="document"
+                {...form.register("document")}
+                className="col-span-3"
+                placeholder="CPF/CNPJ"
+                disabled={isPending}
+              />
+              {form.formState.errors.document && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.document.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address" className="text-right">
+                Endereço
+              </Label>
+              <Input
+                id="address"
+                {...form.register("address")}
+                className="col-span-3"
+                placeholder="Rua, número, bairro, cidade, estado"
+                disabled={isPending}
+              />
+              {form.formState.errors.address && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.address.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="source" className="text-right">
+                Origem
+              </Label>
+              <Input
+                id="source"
+                {...form.register("source")}
+                className="col-span-3"
+                placeholder="Google, Indicação, Instagram, etc"
+                disabled={isPending}
+              />
+              {form.formState.errors.source && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.source.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes" className="text-right">
+                Observações
+              </Label>
+              <Input
+                id="notes"
+                {...form.register("notes")}
+                className="col-span-3"
+                placeholder="Informações adicionais"
+                disabled={isPending}
+              />
+              {form.formState.errors.notes && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.notes.message}
                 </p>
               )}
             </div>

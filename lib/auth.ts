@@ -8,10 +8,22 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     const authCookie = cookieStore.get(AUTH_COOKIE_NAME);
     
     if (!authCookie?.value) {
+      console.log("No auth cookie found");
       return null;
     }
 
     const user = JSON.parse(authCookie.value) as AuthUser;
+    
+    // Validate that required fields exist
+    if (!user.id || !user.email || !user.organizationId) {
+      console.error("Invalid user data in cookie:", { 
+        hasId: !!user.id, 
+        hasEmail: !!user.email, 
+        hasOrgId: !!user.organizationId 
+      });
+      return null;
+    }
+    
     return user;
   } catch (error) {
     console.error("Error parsing auth cookie:", error);

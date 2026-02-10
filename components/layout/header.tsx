@@ -39,9 +39,8 @@ export function Header({ title, description, className, children }: HeaderProps)
             className="w-64 pl-9"
           />
         </div>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
         </Button>
       </div>
     </header>

@@ -9,8 +9,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building, Eye } from "lucide-react";
+import { Phone, Mail, Building, Eye, ExternalLink } from "lucide-react";
 import { CustomerSafe } from "@/lib/frontend-types";
+import Link from "next/link";
 
 interface CustomerTableProps {
   customers: CustomerSafe[];
@@ -49,6 +50,8 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
             <TableHead>Cliente</TableHead>
             <TableHead>Contato</TableHead>
             <TableHead>Empresa</TableHead>
+            <TableHead>Origem</TableHead>
+            <TableHead>Tags</TableHead>
             <TableHead className="text-right">Data de Cadastro</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -64,7 +67,12 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
                       {getInitials(customer.nome)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-medium">{customer.nome}</span>
+                  <Link 
+                    href={`/customers/${customer.id}`}
+                    className="font-medium hover:text-primary hover:underline transition-colors"
+                  >
+                    {customer.nome}
+                  </Link>
                 </div>
               </TableCell>
               <TableCell>
@@ -91,6 +99,29 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
                   <span className="text-muted-foreground text-sm">-</span>
                 )}
               </TableCell>
+              <TableCell>
+                {customer.source ? (
+                  <Badge variant="outline" className="text-xs">
+                    {customer.source}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-sm">-</span>
+                )}
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {customer.tags?.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {customer.tags && customer.tags.length > 2 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{customer.tags.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
               <TableCell className="text-right text-muted-foreground">
                 {new Date(customer.createdAt).toLocaleDateString("pt-BR")}
               </TableCell>
@@ -98,9 +129,11 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onViewDetails?.(customer)}
+                  asChild
                 >
-                  <Eye className="h-4 w-4" />
+                  <Link href={`/customers/${customer.id}`}>
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
                 </Button>
               </TableCell>
             </TableRow>

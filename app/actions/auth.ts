@@ -34,7 +34,7 @@ export async function loginAction(data: LoginData): Promise<{ success: boolean; 
 
     // Criar objeto de autenticação
     const authUser: AuthUser = {
-      userId: user.id,
+      id: user.id,
       organizationId: user.organizationId,
       role: user.role,
       orgName: user.organization.name,

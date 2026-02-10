@@ -83,7 +83,7 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
 
     // Criar objeto de autenticação e fazer login automático
     const authUser: AuthUser = {
-      userId: user.id,
+      id: user.id,
       organizationId: organization.id,
       role: "OWNER",
       orgName: organization.name,

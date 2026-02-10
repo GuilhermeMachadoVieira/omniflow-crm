@@ -34,6 +34,9 @@ const opportunitySchema = z.object({
     const num = val.replace(/[^\d,]/g, "");
     return num === "" ? "0" : num;
   }).refine((val) => parseFloat(val) > 0, "Valor deve ser maior que 0"),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  probability: z.number().min(0, "Probabilidade deve ser entre 0 e 100").max(100, "Probabilidade deve ser entre 0 e 100"),
+  expectedCloseDate: z.string().transform(val => val || ""),
   customerId: z.string().min(1, "Selecione um cliente"),
   columnId: z.string().min(1, "Selecione uma coluna"),
 });
@@ -64,16 +67,23 @@ export function CreateOpportunityDialog({
     defaultValues: {
       title: "",
       value: "",
+      priority: "MEDIUM",
+      probability: 50,
+      expectedCloseDate: "",
       customerId: "",
       columnId: initialColumnId || columns[0]?.id || "",
     },
   });
 
+  // @ts-no-check
   async function onSubmit(data: OpportunityFormData) {
     startTransition(async () => {
       const result = await createOpportunity({
         title: data.title,
         value: parseFloat(data.value),
+        priority: data.priority,
+        probability: data.probability,
+        expectedCloseDate: data.expectedCloseDate ? new Date(data.expectedCloseDate) : undefined,
         customerId: data.customerId,
         columnId: data.columnId,
       });
@@ -83,8 +93,8 @@ export function CreateOpportunityDialog({
         form.reset();
         setOpen(false);
         onCreateComplete?.();
-        // Atualizar o pipeline sem recarregar a página
-        router.refresh();
+        // Força refresh da página para atualizar o pipeline
+        window.location.reload();
       } else {
         toast.error(result.error || "Erro ao criar oportunidade");
       }
@@ -135,6 +145,67 @@ export function CreateOpportunityDialog({
               {form.formState.errors.value && (
                 <p className="col-span-4 text-sm text-red-600">
                   {form.formState.errors.value.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="priority" className="text-right">
+                Prioridade *
+              </Label>
+              <Select
+                value={form.watch("priority")}
+                onValueChange={(value) => form.setValue("priority", value as "LOW" | "MEDIUM" | "HIGH")}
+                disabled={isPending}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Selecione a prioridade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LOW">Baixa</SelectItem>
+                  <SelectItem value="MEDIUM">Média</SelectItem>
+                  <SelectItem value="HIGH">Alta</SelectItem>
+                </SelectContent>
+              </Select>
+              {form.formState.errors.priority && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.priority.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="probability" className="text-right">
+                Probabilidade (%) *
+              </Label>
+              <Input
+                id="probability"
+                type="number"
+                min="0"
+                max="100"
+                {...form.register("probability")}
+                className="col-span-3"
+                placeholder="50"
+                disabled={isPending}
+              />
+              {form.formState.errors.probability && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.probability.message}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="expectedCloseDate" className="text-right">
+                Data Prevista
+              </Label>
+              <Input
+                id="expectedCloseDate"
+                type="date"
+                {...form.register("expectedCloseDate")}
+                className="col-span-3"
+                disabled={isPending}
+              />
+              {form.formState.errors.expectedCloseDate && (
+                <p className="col-span-4 text-sm text-red-600">
+                  {form.formState.errors.expectedCloseDate.message}
                 </p>
               )}
             </div>

@@ -4,6 +4,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { OpportunitySafe } from "@/lib/frontend-types";
 import { cn } from "@/lib/utils";
+import { OpportunityCardMenu } from "./OpportunityCardMenu";
 
 const PRIORITY_LABELS: Record<string, string> = {
   HIGH: "Alta",
@@ -74,30 +75,35 @@ export function BoardCard({ opportunity }: BoardCardProps) {
       }
     : undefined;
 
+  const priorityColor = PRIORITY_STYLES[opportunity.priority] || PRIORITY_STYLES.MEDIUM;
+
   return (
     <Card
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-grab active:cursor-grabbing transition-shadow",
-        isDragging && "opacity-0 pointer-events-none"
+        "cursor-grab transition-shadow hover:shadow-md",
+        isDragging && "opacity-50"
       )}
       {...attributes}
       {...listeners}
     >
-      <CardHeader className="p-4 pb-1">
+      <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <p className="font-medium text-sm leading-tight line-clamp-2">
+          <p className="font-medium text-sm leading-tight line-clamp-2 flex-1">
             {opportunity.title}
           </p>
-          <span
-            className={cn(
-              "shrink-0 rounded-md px-2 py-0.5 text-xs font-medium",
-              PRIORITY_STYLES[opportunity.priority]
-            )}
-          >
-            {PRIORITY_LABELS[opportunity.priority]}
-          </span>
+          <div className="flex items-center gap-1">
+            <span
+              className={cn(
+                "shrink-0 rounded-md px-2 py-0.5 text-xs font-medium",
+                priorityColor
+              )}
+            >
+              {PRIORITY_LABELS[opportunity.priority]}
+            </span>
+            <OpportunityCardMenu opportunity={opportunity} />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0">
