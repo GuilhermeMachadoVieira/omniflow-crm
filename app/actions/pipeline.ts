@@ -48,6 +48,9 @@ export async function updateOpportunityStage(
 export async function createOpportunity(data: {
   title: string;
   value: number;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  probability: number;
+  expectedCloseDate?: Date;
   customerId: string;
   columnId: string;
 }): Promise<{ success: boolean; error?: string }> {
@@ -57,7 +60,7 @@ export async function createOpportunity(data: {
       return { success: false, error: "Não autorizado" };
     }
 
-    const { title, value, customerId, columnId } = data;
+    const { title, value, priority, probability, expectedCloseDate, customerId, columnId } = data;
 
     // Verificar se o cliente existe na organização
     const customer = await prisma.customer.findFirst({
@@ -76,7 +79,9 @@ export async function createOpportunity(data: {
       data: {
         title,
         value: value,
-        priority: "MEDIUM",
+        priority,
+        probability,
+        expectedCloseDate,
         columnId,
         organizationId: currentUser.organizationId,
       },

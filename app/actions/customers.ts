@@ -178,7 +178,7 @@ export async function exportCustomers(organizationId: string): Promise<{ success
 
     const csvContent = [
       headers.join(","),
-      ...customers.map(customer => [
+      ...customers.map((customer: any) => [
         `"${customer.nome.replace(/"/g, '""')}"`,
         `"${customer.email}"`,
         `"${customer.telefone || ""}"`,
