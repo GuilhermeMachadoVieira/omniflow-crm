@@ -13,11 +13,6 @@ export default async function PipelinePage({
 }: {
   searchParams: Promise<{ q?: string; priority?: string }>;
 }) {
-  // Evitar acesso ao banco durante build estático ou quando DATABASE_URL não está disponível
-  if (!process.env.DATABASE_URL) {
-    return <div>Carregando...</div>;
-  }
-
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");

@@ -12,11 +12,6 @@ interface CustomerPageProps {
 }
 
 export default async function CustomerPage({ params }: CustomerPageProps) {
-  // Evitar acesso ao banco durante build estático
-  if (!process.env.DATABASE_URL) {
-    return <div>Carregando...</div>;
-  }
-
   // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
   const { prisma } = await import("@/lib/db");
 
