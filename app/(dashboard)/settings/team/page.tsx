@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { getTeamMembers } from "@/app/actions/team";
-import { TeamMemberSafe } from "@/lib/frontend-types";
 import { TeamClient } from "@/components/team/TeamClient";
 
 export const dynamic = 'force-dynamic';
@@ -13,8 +11,5 @@ export default async function TeamPage() {
     redirect("/login");
   }
 
-  // Buscar dados no servidor (já sanitizados)
-  const members = await getTeamMembers();
-
-  return <TeamClient initialMembers={members} currentUser={user} />;
+  return <TeamClient currentUser={user} />;
 }

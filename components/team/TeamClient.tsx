@@ -1,20 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TeamTable } from "@/components/team/TeamTable";
 import { InviteMemberDialog } from "@/components/team/InviteMemberDialog";
 import { Button } from "@/components/ui/button";
 import { Users, Plus } from "lucide-react";
 import { TeamMemberSafe } from "@/lib/frontend-types";
 import { AuthUser } from "@/lib/types";
+import { getTeamMembers } from "@/app/actions/team";
 
 interface TeamClientProps {
-  initialMembers: TeamMemberSafe[];
+  initialMembers?: TeamMemberSafe[];
   currentUser: AuthUser;
 }
 
 export function TeamClient({ initialMembers, currentUser }: TeamClientProps) {
-  const [members, setMembers] = useState<TeamMemberSafe[]>(initialMembers);
+  const [members, setMembers] = useState<TeamMemberSafe[]>(initialMembers || []);
+
+  useEffect(() => {
+    const loadMembers = async () => {
+      if (!initialMembers) {
+        try {
+          const teamMembers = await getTeamMembers();
+          setMembers(teamMembers);
+        } catch (error) {
+          console.error("Failed to load team members:", error);
+        }
+      }
+    };
+
+    loadMembers();
+  }, [initialMembers]);
 
   // Verificar se o usuário pode convidar membros
   const canInviteMembers = currentUser.role === "OWNER" || currentUser.role === "ADMIN";
