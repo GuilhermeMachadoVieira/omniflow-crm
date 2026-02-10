@@ -1,9 +1,18 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { SettingsClient } from "@/components/settings/SettingsClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SettingsPage() {
+  // Evitar acesso ao banco durante build estático
+  if (!process.env.DATABASE_URL) {
+    return <div>Carregando...</div>;
+  }
+
+  // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
+  const { prisma } = await import("@/lib/db");
+
   const user = await getCurrentUser();
   if (!user || !user.id) {
     redirect("/login");

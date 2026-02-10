@@ -4,11 +4,18 @@ import { getCustomers } from "@/app/actions/customers";
 import { CustomerSafe } from "@/lib/frontend-types";
 import { CustomersClient } from "@/components/customers/CustomersClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function CustomersPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  // Evitar acesso ao banco durante build estático ou quando DATABASE_URL não está disponível
+  if (!process.env.DATABASE_URL) {
+    return <div>Carregando...</div>;
+  }
+
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");

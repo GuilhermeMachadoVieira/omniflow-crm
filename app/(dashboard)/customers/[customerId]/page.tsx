@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { CustomerSafe, sanitizeCustomer } from "@/lib/frontend-types";
 import { CustomerDetailDashboard } from "@/components/customers/CustomerDetailDashboard";
+
+export const dynamic = 'force-dynamic';
 
 interface CustomerPageProps {
   params: Promise<{
@@ -11,6 +12,14 @@ interface CustomerPageProps {
 }
 
 export default async function CustomerPage({ params }: CustomerPageProps) {
+  // Evitar acesso ao banco durante build estático
+  if (!process.env.DATABASE_URL) {
+    return <div>Carregando...</div>;
+  }
+
+  // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
+  const { prisma } = await import("@/lib/db");
+
   const currentUser = await getCurrentUser();
   if (!currentUser) {
     redirect("/login");
