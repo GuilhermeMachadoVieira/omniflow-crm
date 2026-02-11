@@ -12,6 +12,11 @@ interface CustomerPageProps {
 }
 
 export default async function CustomerPage({ params }: CustomerPageProps) {
+  // Verificar se DATABASE_URL está disponível (evita erro durante build)
+  if (!process.env.DATABASE_URL) {
+    redirect("/customers");
+  }
+
   // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
   try {
     const { prisma } = await import("@/lib/database");

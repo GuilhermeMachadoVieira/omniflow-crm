@@ -5,6 +5,11 @@ import { SettingsClient } from "@/components/settings/SettingsClient";
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
+  // Verificar se DATABASE_URL está disponível (evita erro durante build)
+  if (!process.env.DATABASE_URL) {
+    redirect("/dashboard");
+  }
+
   // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
   const { prisma } = await import("@/lib/database");
 
