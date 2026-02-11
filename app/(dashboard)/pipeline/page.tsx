@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 import { PipelineClient } from "@/components/pipeline/PipelineClient";
 
 export const dynamic = 'force-dynamic';

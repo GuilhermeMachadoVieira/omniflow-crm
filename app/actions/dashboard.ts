@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/database";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 
 export async function getDashboardMetrics() {
   try {

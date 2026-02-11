@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 import { CustomerSafe, sanitizeCustomer } from "@/lib/frontend-types";
 import { CustomerDetailDashboard } from "@/components/customers/CustomerDetailDashboard";
 

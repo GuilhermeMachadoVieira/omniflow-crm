@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 import { TeamClient } from "@/components/team/TeamClient";
 
 export const dynamic = 'force-dynamic';

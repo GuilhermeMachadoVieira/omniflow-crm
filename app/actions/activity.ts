@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/database";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 import { z } from "zod";
 
 const activitySchema = z.object({

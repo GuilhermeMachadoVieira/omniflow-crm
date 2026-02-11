@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/database";
+import * as bcrypt from "bcrypt";
 
 interface RegisterData {
   nome: string;
@@ -51,8 +52,7 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
     });
 
     // Hash da senha
-    const { hashPassword } = await import("@/lib/auth");
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Criar usuário
     const user = await prisma.user.create({

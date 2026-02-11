@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/nextauth-client";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 
 export const dynamic = 'force-dynamic';

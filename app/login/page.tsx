@@ -161,13 +161,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              <strong>Demo:</strong><br />
-              Admin: admin@omniflow.com / admin123<br />
-              Vendedor: vendedor@omniflow.com / vendedor123
-            </p>
-          </div>
         </div>
       </div>
     </div>
