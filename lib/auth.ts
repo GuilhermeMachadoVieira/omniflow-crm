@@ -17,7 +17,6 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     const authCookie = cookieStore.get(AUTH_COOKIE_NAME);
     
     if (!authCookie?.value) {
-      console.log("No auth cookie found");
       return null;
     }
 
@@ -33,48 +32,49 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
     // Validar estrutura básica
     if (!authUser.id || !authUser.email || !authUser.organizationId) {
-      console.error("Invalid user data in cookie:", { 
-        hasId: !!authUser.id, 
-        hasEmail: !!authUser.email, 
-        hasOrgId: !!authUser.organizationId 
-      });
       cookieStore.delete(AUTH_COOKIE_NAME);
       return null;
     }
 
-    // Skip database validation during build time
-    if (process.env.NEXT_PHASE === "phase-production-build") {
-      console.warn("Skipping database validation during build");
-      return authUser;
-    }
-
-    // Verificar se usuário ainda existe no banco (production validation)
-    try {
-      const user = await prisma.user.findUnique({
-        where: { 
-          id: authUser.id,
-          organizationId: authUser.organizationId 
-        },
-        include: {
-          organization: true,
-        },
-      });
-
-      if (!user) {
-        console.log("User not found in database, clearing cookie");
-        cookieStore.delete(AUTH_COOKIE_NAME);
-        return null;
-      }
-    } catch (dbError) {
-      // Se DATABASE_URL não estiver disponível, retorna o usuário do cookie
-      console.warn("Database validation skipped:", dbError);
-      return authUser;
-    }
-
+    // Para APIs e routes, retorna o usuário do cookie sem validação no banco
+    // A validação no banco é feita apenas em páginas críticas
     return authUser;
   } catch (error) {
     console.error("Error getting current user:", error);
     return null;
+  }
+}
+
+export async function getCurrentUserWithValidation(): Promise<AuthUser | null> {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    return null;
+  }
+
+  try {
+    // Verificar se usuário ainda existe no banco
+    const dbUser = await prisma.user.findUnique({
+      where: { 
+        id: user.id,
+        organizationId: user.organizationId 
+      },
+      include: {
+        organization: true,
+      },
+    });
+
+    if (!dbUser) {
+      // Remove cookie inválido
+      const cookieStore = await cookies();
+      cookieStore.delete(AUTH_COOKIE_NAME);
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Database validation error:", error);
+    return user; // Retorna usuário do cookie em caso de erro
   }
 }
 
