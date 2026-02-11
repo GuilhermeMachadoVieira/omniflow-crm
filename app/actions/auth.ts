@@ -1,8 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
-import * as bcrypt from "bcrypt";
-import { AUTH_COOKIE_NAME, AuthUser } from "@/lib/types";
+import { redirect } from "next/navigation";
+import { createAuthSession, destroyAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/database";
 
 interface LoginData {
   email: string;
@@ -11,9 +11,6 @@ interface LoginData {
 
 export async function loginAction(data: LoginData): Promise<{ success: boolean; error?: string }> {
   try {
-    // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
-    const { prisma } = await import("@/lib/db");
-    
     const { email, password } = data;
 
     // Buscar usuário com organização
@@ -29,29 +26,20 @@ export async function loginAction(data: LoginData): Promise<{ success: boolean; 
     }
 
     // Verificar senha
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const { verifyPassword } = await import("@/lib/auth");
+    const isPasswordValid = await verifyPassword(password, user.passwordHash);
     if (!isPasswordValid) {
       return { success: false, error: "E-mail ou senha incorretos" };
     }
 
-    // Criar objeto de autenticação
-    const authUser: AuthUser = {
+    // Criar sessão de autenticação
+    await createAuthSession({
       id: user.id,
-      organizationId: user.organizationId,
-      role: user.role,
-      orgName: user.organization.name,
-      nome: user.nome,
       email: user.email,
-    };
-
-    // Salvar no cookie
-    const cookieStore = await cookies();
-    cookieStore.set(AUTH_COOKIE_NAME, JSON.stringify(authUser), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
+      nome: user.nome,
+      role: user.role,
+      organizationId: user.organizationId,
+      orgName: user.organization.name,
     });
 
     return { success: true };
@@ -63,8 +51,7 @@ export async function loginAction(data: LoginData): Promise<{ success: boolean; 
 
 export async function logoutAction(): Promise<{ success: boolean }> {
   try {
-    const cookieStore = await cookies();
-    cookieStore.delete(AUTH_COOKIE_NAME);
+    await destroyAuthSession();
     return { success: true };
   } catch (error) {
     console.error("Logout error:", error);

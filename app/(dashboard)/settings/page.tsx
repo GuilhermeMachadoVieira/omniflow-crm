@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
   // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
-  const { prisma } = await import("@/lib/db");
+  const { prisma } = await import("@/lib/database");
 
   const user = await getCurrentUser();
   if (!user || !user.id) {

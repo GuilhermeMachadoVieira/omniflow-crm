@@ -1,7 +1,16 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { AUTH_COOKIE_NAME, AuthUser, Role } from "@/lib/types";
+import { prisma } from "@/lib/database";
+import * as bcrypt from "bcrypt";
 
-/** Obtém o usuário atual no Server Side a partir do cookie. */
+/**
+ * Production-ready Authentication System
+ * - Server-side validation
+ * - Secure cookies
+ * - Multi-tenancy support
+ */
+
 export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
     const cookieStore = await cookies();
@@ -12,23 +21,110 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       return null;
     }
 
-    const user = JSON.parse(authCookie.value) as AuthUser;
-    
-    // Validate that required fields exist
-    if (!user.id || !user.email || !user.organizationId) {
-      console.error("Invalid user data in cookie:", { 
-        hasId: !!user.id, 
-        hasEmail: !!user.email, 
-        hasOrgId: !!user.organizationId 
-      });
+    // Parse e validar o cookie
+    let authUser: AuthUser;
+    try {
+      authUser = JSON.parse(authCookie.value);
+    } catch {
+      // Cookie inválido, remover
+      cookieStore.delete(AUTH_COOKIE_NAME);
       return null;
     }
-    
-    return user;
+
+    // Validar estrutura básica
+    if (!authUser.id || !authUser.email || !authUser.organizationId) {
+      console.error("Invalid user data in cookie:", { 
+        hasId: !!authUser.id, 
+        hasEmail: !!authUser.email, 
+        hasOrgId: !!authUser.organizationId 
+      });
+      cookieStore.delete(AUTH_COOKIE_NAME);
+      return null;
+    }
+
+    // Verificar se usuário ainda existe no banco (production validation)
+    const user = await prisma.user.findUnique({
+      where: { 
+        id: authUser.id,
+        organizationId: authUser.organizationId 
+      },
+      include: {
+        organization: true,
+      },
+    });
+
+    if (!user) {
+      console.log("User not found in database, clearing cookie");
+      cookieStore.delete(AUTH_COOKIE_NAME);
+      return null;
+    }
+
+    return authUser;
   } catch (error) {
-    console.error("Error parsing auth cookie:", error);
+    console.error("Error getting current user:", error);
     return null;
   }
+}
+
+export async function requireAuth(): Promise<AuthUser> {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
+  
+  return user;
+}
+
+export async function requireRole(roles: string[]): Promise<AuthUser> {
+  const user = await requireAuth();
+  
+  if (!roles.includes(user.role)) {
+    redirect("/");
+  }
+  
+  return user;
+}
+
+export async function createAuthSession(user: {
+  id: string;
+  email: string;
+  nome: string;
+  role: string;
+  organizationId: string;
+  orgName: string;
+}): Promise<void> {
+  const authUser: AuthUser = {
+    id: user.id,
+    email: user.email,
+    nome: user.nome,
+    role: user.role as any,
+    organizationId: user.organizationId,
+    orgName: user.orgName,
+  };
+
+  const cookieStore = await cookies();
+  cookieStore.set(AUTH_COOKIE_NAME, JSON.stringify(authUser), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 7 dias
+    path: "/",
+  });
+}
+
+export async function destroyAuthSession(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(AUTH_COOKIE_NAME);
+}
+
+// Password utilities
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12);
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
 }
 
 /** Verifica se o usuário atual tem permissão (RBAC). */

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/database";
 import { getCurrentUser } from "@/lib/auth";
 import { CustomerSafe, sanitizeCustomer } from "@/lib/frontend-types";
 

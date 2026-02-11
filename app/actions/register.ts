@@ -1,8 +1,7 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { AUTH_COOKIE_NAME, AuthUser } from "@/lib/types";
-import * as bcrypt from "bcrypt";
+import { createAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/database";
 
 interface RegisterData {
   nome: string;
@@ -23,9 +22,6 @@ function generateSlug(name: string): string {
 
 export async function registerAction(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
-    // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
-    const { prisma } = await import("@/lib/db");
-    
     const { nome, email, password, empresa } = data;
 
     // Validar dados básicos
@@ -37,7 +33,7 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
       return { success: false, error: "A senha deve ter pelo menos 6 caracteres" };
     }
 
-    // Verificar se email já existe antes da transação
+    // Verificar se email já existe
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -55,8 +51,11 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
       },
     });
 
+    // Hash da senha
+    const { hashPassword } = await import("@/lib/auth");
+    const hashedPassword = await hashPassword(password);
+
     // Criar usuário
-    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         nome,
@@ -83,29 +82,16 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
       })),
     });
 
-    // Criar objeto de autenticação e fazer login automático
-    const authUser: AuthUser = {
+    // Criar sessão de autenticação
+    await createAuthSession({
       id: user.id,
-      organizationId: organization.id,
-      role: "OWNER",
-      orgName: organization.name,
-      nome: user.nome,
       email: user.email,
-    };
-
-    console.log("Setting auth cookie with:", authUser);
-
-    // Salvar no cookie
-    const cookieStore = await cookies();
-    cookieStore.set(AUTH_COOKIE_NAME, JSON.stringify(authUser), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
+      nome: user.nome,
+      role: user.role,
+      organizationId: organization.id,
+      orgName: organization.name,
     });
 
-    console.log("Registration successful, redirecting...");
     return { success: true };
   } catch (error) {
     console.error("Registration error:", error);

@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/database";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function getDashboardMetrics() {
