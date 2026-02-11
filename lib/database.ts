@@ -18,6 +18,11 @@ export function getPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
   
   if (!databaseUrl) {
+    // Durante build time, retorna null para evitar erro
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      console.warn("DATABASE_URL not available during build, skipping database operations");
+      return null as any;
+    }
     throw new Error("DATABASE_URL is not configured");
   }
 
