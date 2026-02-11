@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
 import { AUTH_COOKIE_NAME, AuthUser } from "@/lib/types";
 import * as bcrypt from "bcrypt";
 
@@ -24,6 +23,9 @@ function generateSlug(name: string): string {
 
 export async function registerAction(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
+    // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
+    const { prisma } = await import("@/lib/db");
+    
     const { nome, email, password, empresa } = data;
 
     // Validar dados básicos

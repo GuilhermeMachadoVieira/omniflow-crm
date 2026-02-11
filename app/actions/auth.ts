@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
 import * as bcrypt from "bcrypt";
 import { AUTH_COOKIE_NAME, AuthUser } from "@/lib/types";
 
@@ -12,6 +11,9 @@ interface LoginData {
 
 export async function loginAction(data: LoginData): Promise<{ success: boolean; error?: string }> {
   try {
+    // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
+    const { prisma } = await import("@/lib/db");
+    
     const { email, password } = data;
 
     // Buscar usuário com organização
