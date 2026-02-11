@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 
   const token = await getToken({ 
     req: request, 
-    secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-only' 
+    secret: process.env.NEXTAUTH_SECRET
   });
   const isAuthenticated = Boolean(token);
 

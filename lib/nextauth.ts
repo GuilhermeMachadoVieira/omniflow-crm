@@ -8,12 +8,7 @@ console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || (() => {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('NEXTAUTH_SECRET is required in production');
-    }
-    return 'fallback-secret-for-development-only';
-  })(),
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
