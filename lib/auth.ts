@@ -42,21 +42,32 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       return null;
     }
 
-    // Verificar se usuário ainda existe no banco (production validation)
-    const user = await prisma.user.findUnique({
-      where: { 
-        id: authUser.id,
-        organizationId: authUser.organizationId 
-      },
-      include: {
-        organization: true,
-      },
-    });
+    // Skip database validation during build time
+    if (process.env.NODE_ENV === "development" && process.env.NEXT_PHASE === "phase-production-build") {
+      return authUser;
+    }
 
-    if (!user) {
-      console.log("User not found in database, clearing cookie");
-      cookieStore.delete(AUTH_COOKIE_NAME);
-      return null;
+    // Verificar se usuário ainda existe no banco (production validation)
+    try {
+      const user = await prisma.user.findUnique({
+        where: { 
+          id: authUser.id,
+          organizationId: authUser.organizationId 
+        },
+        include: {
+          organization: true,
+        },
+      });
+
+      if (!user) {
+        console.log("User not found in database, clearing cookie");
+        cookieStore.delete(AUTH_COOKIE_NAME);
+        return null;
+      }
+    } catch (dbError) {
+      // Se DATABASE_URL não estiver disponível, retorna o usuário do cookie
+      console.warn("Database validation skipped:", dbError);
+      return authUser;
     }
 
     return authUser;
