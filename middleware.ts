@@ -21,7 +21,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-only' 
+  });
   const isAuthenticated = Boolean(token);
 
   // 1. Se o usuário JÁ ESTÁ logado e tenta acessar Login ou Registro,
