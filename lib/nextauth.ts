@@ -1,7 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/database";
-import { verifyPassword } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -23,6 +22,8 @@ export const authOptions: NextAuthOptions = {
 
         if (!email || !password) return null;
 
+        const { prisma } = await import("@/lib/database");
+
         const user = await prisma.user.findUnique({
           where: { email },
           include: { organization: true },
@@ -30,7 +31,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) return null;
 
-        const ok = await verifyPassword(password, user.passwordHash);
+        const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
 
         return {

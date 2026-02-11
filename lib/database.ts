@@ -37,5 +37,10 @@ export function getPrismaClient() {
   return prisma;
 }
 
-// Export singleton
-export const prisma = getPrismaClient();
+// Export singleton (lazy) para evitar crash no build quando DATABASE_URL não está disponível.
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getPrismaClient();
+    return Reflect.get(client as any, prop, receiver);
+  },
+});
