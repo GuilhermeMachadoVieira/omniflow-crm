@@ -15,9 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { logoutAction } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { signOut } from "next-auth/react";
 
 export function Sidebar() {
   const { user } = useCurrentUser();
@@ -35,13 +35,10 @@ export function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      const result = await logoutAction();
-      if (result.success) {
-        toast.success("Logout realizado com sucesso!");
-        router.push("/login");
-      } else {
-        toast.error("Erro ao fazer logout");
-      }
+      await signOut({ redirect: false });
+      toast.success("Logout realizado com sucesso!");
+      router.push("/login");
+      router.refresh();
     } catch (error) {
       toast.error("Erro ao fazer logout");
     }

@@ -21,10 +21,8 @@ export function getPrismaClient() {
     throw new Error("DATABASE_URL is not configured");
   }
 
-  const adapter = new PrismaPg({ 
+  const adapter = new PrismaPg({
     connectionString: databaseUrl,
-    // Connection pooling para production
-    poolSize: process.env.NODE_ENV === "production" ? 10 : 1,
   });
 
   const prisma = new PrismaClient({
@@ -34,9 +32,7 @@ export function getPrismaClient() {
     errorFormat: "pretty",
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = prisma;
-  }
+  globalForPrisma.prisma = prisma;
 
   return prisma;
 }

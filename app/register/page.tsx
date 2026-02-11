@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerAction } from "@/app/actions/register";
 import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 const registerSchema = z.object({
   nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -49,11 +50,24 @@ export default function RegisterPage() {
     try {
       const result = await registerAction(data);
       if (result.success) {
-        setSuccess("Conta criada com sucesso! Redirecionando...");
-        setTimeout(() => {
-          router.push("/");
-          router.refresh();
-        }, 1500);
+        const signInResult = await signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (signInResult?.ok) {
+          setSuccess("Conta criada com sucesso! Redirecionando...");
+          setTimeout(() => {
+            router.push("/");
+            router.refresh();
+          }, 800);
+        } else {
+          setSuccess("Conta criada com sucesso! Faça login para continuar.");
+          setTimeout(() => {
+            router.push("/login");
+          }, 1000);
+        }
       } else {
         setError(result.error || "Erro ao criar conta");
       }

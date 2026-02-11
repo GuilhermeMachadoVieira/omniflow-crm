@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { AuthUser } from "@/lib/types";
 
 interface UserProviderProps {
   children: React.ReactNode;

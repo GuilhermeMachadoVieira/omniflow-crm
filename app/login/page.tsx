@@ -9,8 +9,8 @@ import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginAction } from "@/app/actions/auth";
 import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
@@ -38,13 +38,19 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const result = await loginAction(data);
-      if (result.success) {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
         router.push("/");
         router.refresh();
-      } else {
-        setError(result.error || "Erro ao fazer login");
+        return;
       }
+
+      setError("E-mail ou senha incorretos");
     } catch (error) {
       setError("Erro ao fazer login");
     } finally {

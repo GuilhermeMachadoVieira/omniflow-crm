@@ -1,6 +1,5 @@
 "use server";
 
-import { createAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/database";
 
 interface RegisterData {
@@ -80,16 +79,6 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
         ...col,
         organizationId: organization.id,
       })),
-    });
-
-    // Criar sessão de autenticação
-    await createAuthSession({
-      id: user.id,
-      email: user.email,
-      nome: user.nome,
-      role: user.role,
-      organizationId: organization.id,
-      orgName: organization.name,
     });
 
     return { success: true };

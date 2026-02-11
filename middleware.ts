@@ -1,27 +1,28 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE_NAME } from "@/lib/types";
+import { getToken } from "next-auth/jwt";
 
 // Defina aqui todas as rotas que podem ser acessadas SEM login
 const PUBLIC_PATHS = ["/login", "/register"];
+const PUBLIC_PREFIXES = ["/api/health", "/api/auth/user", "/api/auth/"]; // inclui NextAuth
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  // Ignorar preflight
+  if (request.method === "OPTIONS") {
+    return NextResponse.next();
+  }
   
   // Verifica se a rota atual está na lista de públicas
   const isPublicPath = PUBLIC_PATHS.includes(path);
-  
-  const authCookie = request.cookies.get(AUTH_COOKIE_NAME);
-  
-  // Verifica se o cookie contém dados JSON (novo formato) ou valor antigo
-  let isAuthenticated = false;
-  
-  if (authCookie?.value) {
-    // Se tiver valor, assumimos que está autenticado (seja JSON ou string simples)
-    isAuthenticated = true; 
-    // Nota: A validação profunda do token/sessão geralmente ocorre no Server Action ou Page,
-    // o middleware faz apenas a verificação de existência para roteamento rápido.
+  const isPublicPrefix = PUBLIC_PREFIXES.some((prefix) => path.startsWith(prefix));
+  if (isPublicPrefix) {
+    return NextResponse.next();
   }
+
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const isAuthenticated = Boolean(token);
 
   // 1. Se o usuário JÁ ESTÁ logado e tenta acessar Login ou Registro,
   // manda ele direto para o Dashboard (não faz sentido ele se cadastrar de novo)

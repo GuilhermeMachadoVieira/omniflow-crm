@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const LOGIN_PATH = "/login";
 
@@ -16,20 +17,15 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { status } = useSession();
 
   useEffect(() => {
-    // Verificação simples de cookie
     if (pathname === LOGIN_PATH) return;
-    
-    const hasCookie = document.cookie.includes("omniflow-auth=");
-    console.log("AuthGuard - pathname:", pathname, "hasCookie:", hasCookie);
-    console.log("AuthGuard - all cookies:", document.cookie);
-    
-    if (!hasCookie) {
-      console.log("AuthGuard - Redirecting to login");
+
+    if (status === "unauthenticated") {
       router.replace(LOGIN_PATH);
     }
-  }, [pathname, router]);
+  }, [pathname, router, status]);
 
   return <>{children}</>;
 }
