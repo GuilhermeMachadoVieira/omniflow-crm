@@ -43,8 +43,8 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     }
 
     // Skip database validation during build time
-    if (!process.env.DATABASE_URL) {
-      console.warn("DATABASE_URL not available, skipping database validation");
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      console.warn("Skipping database validation during build");
       return authUser;
     }
 
