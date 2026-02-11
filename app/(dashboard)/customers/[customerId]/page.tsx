@@ -13,7 +13,8 @@ interface CustomerPageProps {
 
 export default async function CustomerPage({ params }: CustomerPageProps) {
   // Import dinâmico do prisma apenas quando DATABASE_URL está disponível
-  const { prisma } = await import("@/lib/database");
+  try {
+    const { prisma } = await import("@/lib/database");
 
   const currentUser = await getCurrentUser();
   if (!currentUser) {
