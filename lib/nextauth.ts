@@ -4,11 +4,12 @@ import bcrypt from "bcrypt";
 
 // Debug environment variables
 console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+console.log('AUTH_SECRET exists:', !!process.env.AUTH_SECRET);
 console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
   },

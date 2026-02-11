@@ -10,7 +10,9 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       environment: {
         NEXTAUTH_SECRET_EXISTS: !!process.env.NEXTAUTH_SECRET,
+        AUTH_SECRET_EXISTS: !!process.env.AUTH_SECRET,
         NEXTAUTH_SECRET_LENGTH: process.env.NEXTAUTH_SECRET?.length || 0,
+        AUTH_SECRET_LENGTH: process.env.AUTH_SECRET?.length || 0,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         NODE_ENV: process.env.NODE_ENV,
         DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
