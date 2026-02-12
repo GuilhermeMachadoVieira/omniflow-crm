@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, AlertTriangle, Trash2 } from "lucide-react";
+import { Loader2, AlertTriangle, Trash2, Shield, ShieldCheck, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -65,6 +65,28 @@ export function SecuritySettings({ user }: SecuritySettingsProps) {
     });
   }
 
+  function getRoleIcon(role: string) {
+    switch (role) {
+      case "OWNER":
+        return <Crown className="h-4 w-4 text-yellow-500" />;
+      case "ADMIN":
+        return <ShieldCheck className="h-4 w-4 text-blue-500" />;
+      default:
+        return <Shield className="h-4 w-4 text-gray-500" />;
+    }
+  }
+
+  function getRoleLabel(role: string) {
+    switch (role) {
+      case "OWNER":
+        return "Proprietário";
+      case "ADMIN":
+        return "Administrador";
+      default:
+        return "Membro";
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -86,11 +108,12 @@ export function SecuritySettings({ user }: SecuritySettingsProps) {
               <Label className="text-sm font-medium text-muted-foreground">
                 Tipo de Usuário
               </Label>
-              <p className="font-medium capitalize">
-                {user.role === "OWNER" && "Proprietário"}
-                {user.role === "ADMIN" && "Administrador"}
-                {user.role === "MEMBER" && "Membro"}
-              </p>
+              <div className="flex items-center space-x-2">
+                <p className="font-medium capitalize">
+                  {getRoleLabel(user.role)}
+                </p>
+                {getRoleIcon(user.role)}
+              </div>
             </div>
           </div>
           
@@ -206,11 +229,11 @@ export function SecuritySettings({ user }: SecuritySettingsProps) {
                       ...prev, 
                       confirmation: e.target.value 
                     }))}
-                    placeholder='Digite "DELETAR" para confirmar'
+                    placeholder='Digite &quot;DELETAR&quot; para confirmar'
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Digite exatamente "DELETAR" para confirmar a exclusão
+                    Digite exatamente &quot;DELETAR&quot; para confirmar a exclusão
                   </p>
                 </div>
 

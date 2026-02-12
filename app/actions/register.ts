@@ -47,8 +47,29 @@ export async function registerAction(data: RegisterData): Promise<{ success: boo
       return { success: false, error: "Este e-mail já está cadastrado" };
     }
 
-    // Criar organização primeiro
-    const slug = generateSlug(empresa);
+    // Criar organização primeiro, garantindo slug único
+    const baseSlug = generateSlug(empresa);
+    let slug = baseSlug;
+    let suffix = 1;
+
+    // Evita falha de registro por colisão de slug entre organizações
+    // (ex.: duas empresas com nomes iguais).
+    // Loop simples com limite razoável de tentativas.
+    // Isso blinda o fluxo de Registro contra erros 500 por conflito único.
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const existingOrg = await prisma.organization.findUnique({
+        where: { slug },
+      });
+
+      if (!existingOrg) {
+        break;
+      }
+
+      slug = `${baseSlug}-${suffix}`;
+      suffix += 1;
+    }
+
     const organization = await prisma.organization.create({
       data: {
         name: empresa,

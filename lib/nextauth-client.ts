@@ -10,7 +10,11 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     if (!session?.user) {
       return null;
     }
-
+    
+    /**
+     * Mapeia explicitamente o shape para AuthUser,
+     * garantindo consistência com `next-auth.d.ts` e o store do frontend.
+     */
     return {
       id: session.user.id,
       email: session.user.email || "",
@@ -18,6 +22,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       role: session.user.role as Role,
       organizationId: session.user.organizationId,
       orgName: session.user.orgName,
+      image: session.user.image ?? null,
     };
   } catch (error) {
     console.error("Error getting current user:", error);

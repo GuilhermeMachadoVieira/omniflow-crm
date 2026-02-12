@@ -57,7 +57,13 @@ export function InviteMemberDialog({ children, onInviteComplete }: InviteMemberD
 
   async function onSubmit(data: MemberFormData) {
     startTransition(async () => {
-      const result = await inviteMember(data);
+      // Convert data to FormData
+      const formData = new FormData();
+      formData.append("nome", data.nome);
+      formData.append("email", data.email);
+      formData.append("role", data.role);
+      
+      const result = await inviteMember(formData);
 
       if (result.success) {
         toast.success("Membro convidado com sucesso!");

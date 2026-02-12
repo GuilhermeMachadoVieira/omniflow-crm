@@ -1,9 +1,42 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@prisma/client'],
+  serverExternalPackages: ["@prisma/client"],
   async headers() {
+    /**
+     * Em desenvolvimento, o Next.js usa React Refresh e source maps
+     * que dependem de `eval` (ou equivalente). Por isso, precisamos
+     * permitir `'unsafe-eval'` APENAS em dev, mantendo produção segura.
+     */
+    const scriptSrcParts = [
+      "script-src 'self'",
+      "'unsafe-inline'",
+      "https://cdn.jsdelivr.net",
+    ];
+
+    if (!isProd) {
+      scriptSrcParts.push("'unsafe-eval'");
+    }
+
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      scriptSrcParts.join(" "),
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      // Adicionado https: para suportar URLs externas do Supabase Storage
+      "img-src 'self' data: blob: https:",
+      // Permitir conexões com Supabase e domínios necessários
+      "connect-src 'self' https://*.supabase.co https://api.supabase.co",
+      "frame-src 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "upgrade-insecure-requests",
+    ].join("; ");
+
     return [
       {
         source: "/(.*)",
@@ -18,30 +51,17 @@ const nextConfig: NextConfig = {
           // Content Security Policy
           {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              // Removido unsafe-eval, mantido unsafe-inline apenas para estilos inline necessários
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              // Adicionado https: para suportar URLs externas do Supabase Storage
-              "img-src 'self' data: blob: https:",
-              // Permitir conexões com Supabase e domínios necessários
-              "connect-src 'self' https://*.supabase.co https://api.supabase.co",
-              "frame-src 'none'",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "upgrade-insecure-requests"
-            ].join("; "),
+            value: contentSecurityPolicy,
           },
           // HSTS (apenas em produção)
-          ...(process.env.NODE_ENV === 'production' ? [
-            {
-              key: "Strict-Transport-Security",
-              value: "max-age=31536000; includeSubDomains; preload"
-            }
-          ] : []),
+          ...(isProd
+            ? [
+                {
+                  key: "Strict-Transport-Security",
+                  value: "max-age=31536000; includeSubDomains; preload",
+                },
+              ]
+            : []),
         ],
       },
     ];

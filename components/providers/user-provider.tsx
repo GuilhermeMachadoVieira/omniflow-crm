@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import type { AuthUser } from "@/lib/types";
 
 interface UserProviderProps {
   children: React.ReactNode;
@@ -20,7 +21,23 @@ export function UserProvider({ children }: UserProviderProps) {
 
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user);
+          const rawUser = data.user as any | null;
+
+          if (rawUser) {
+            const mappedUser: AuthUser = {
+              id: rawUser.id,
+              email: rawUser.email || "",
+              nome: rawUser.nome || rawUser.name || "",
+              role: rawUser.role,
+              organizationId: rawUser.organizationId,
+              orgName: rawUser.orgName,
+              image: rawUser.image ?? null,
+            };
+
+            setUser(mappedUser);
+          } else {
+            setUser(null);
+          }
         } else {
           setUser(null);
         }

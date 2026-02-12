@@ -24,7 +24,9 @@ export function TeamClient({ initialMembers, currentUser }: TeamClientProps) {
       const loadMembers = async () => {
         try {
           const teamMembers = await getTeamMembers();
-          setMembers(teamMembers);
+          if (teamMembers.success && teamMembers.data) {
+            setMembers(teamMembers.data);
+          }
         } catch (error) {
           console.error("Failed to load team members:", error);
         }

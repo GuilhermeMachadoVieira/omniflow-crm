@@ -102,7 +102,13 @@ export function TeamManagementClient({
   async function onSubmit(data: InviteFormData) {
     setIsLoading(true);
     try {
-      const result = await inviteMember(data);
+      // Convert data to FormData
+      const formData = new FormData();
+      formData.append("nome", data.nome);
+      formData.append("email", data.email);
+      formData.append("role", data.role);
+      
+      const result = await inviteMember(formData);
       if (result.success) {
         setIsDialogOpen(false);
         reset();

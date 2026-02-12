@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/nextauth-client";
 import { PasswordChange } from "@/components/settings/PasswordChange";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = 'force-dynamic';
 
@@ -43,10 +43,10 @@ export default async function PasswordSettingsPage() {
             Senha
           </Link>
           <Link
-            href="/settings/team"
+            href="/settings/security"
             className="px-4 py-2 rounded-lg border text-center bg-muted text-muted-foreground hover:bg-muted/80"
           >
-            Equipe
+            Segurança
           </Link>
         </div>
 
@@ -63,6 +63,15 @@ export default async function PasswordSettingsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <h4 className="font-medium">✅ Boas Práticas</h4>
+                <p className="text-sm text-muted-foreground">
+                  Não tem conta?{" "}
+                  <a 
+                    href="/register" 
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Crie sua empresa agora
+                  </a>
+                </p>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Use senhas únicas para cada serviço</li>
                   <li>• Altere sua senha regularmente</li>
@@ -74,8 +83,8 @@ export default async function PasswordSettingsPage() {
                 <h4 className="font-medium">❌ Evite</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Datas de nascimento ou nomes</li>
-                  <li>• Sequências como "123456"</li>
-                  <li>• Palavras comuns como "senha"</li>
+                  <li>• Sequências como &quot;123456&quot;</li>
+                  <li>• Palavras comuns como &quot;senha&quot;</li>
                   <li>• Reutilizar senhas antigas</li>
                 </ul>
               </div>
