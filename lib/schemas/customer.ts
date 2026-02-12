@@ -88,6 +88,11 @@ export const customerSchema = z.object({
     .max(255, "E-mail deve ter no máximo 255 caracteres")
     .transform(val => val.toLowerCase().trim()),
   
+  image: z.string()
+    .url("URL da imagem inválida")
+    .optional()
+    .nullable(),
+  
   telefone: z.string()
     .optional()
     .refine((val) => !val || isValidPhone(val), {
@@ -132,6 +137,7 @@ export const customerSchema = z.object({
 export const createCustomerSchema = customerSchema.pick({
   nome: true,
   email: true,
+  image: true,
   telefone: true,
   empresa: true,
   document: true,
@@ -145,6 +151,7 @@ export const createCustomerSchema = customerSchema.pick({
 export const updateCustomerSchema = z.object({
   nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").optional(),
   email: z.string().email("E-mail inválido").optional(),
+  image: z.string().url("URL da imagem inválida").optional().nullable(),
   telefone: z.string()
     .optional()
     .refine((val) => !val || isValidPhone(val), {

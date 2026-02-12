@@ -10,8 +10,14 @@ import { Prisma } from "@prisma/client";
 export interface CreateCustomerData {
   nome: string;
   email: string;
+  image?: string | null;
   telefone: string;
   empresa: string;
+  document?: string;
+  address?: string;
+  source?: string;
+  tags?: string[];
+  notes?: string;
 }
 
 export async function createCustomer(data: CreateCustomerData): Promise<{ success: boolean; error?: string }> {
@@ -21,7 +27,7 @@ export async function createCustomer(data: CreateCustomerData): Promise<{ succes
       return { success: false, error: "Não autorizado" };
     }
 
-    const { nome, email, telefone, empresa } = data;
+    const { nome, email, image, telefone, empresa, document, address, source, tags, notes } = data;
 
     // Verificar se já existe cliente com este e-mail na organização
     const existingCustomer = await prisma.customer.findFirst({
@@ -40,8 +46,14 @@ export async function createCustomer(data: CreateCustomerData): Promise<{ succes
       data: {
         nome,
         email,
+        image,
         telefone,
         empresa,
+        document,
+        address,
+        source,
+        tags,
+        notes,
         userId: currentUser.id,
         organizationId: currentUser.organizationId,
       },
@@ -93,6 +105,7 @@ export async function getCustomers(organizationId: string, query?: string): Prom
 export async function updateCustomer(customerId: string, data: {
   nome: string;
   email: string;
+  image?: string | null;
   telefone?: string;
   empresa?: string;
   document?: string;
@@ -127,6 +140,7 @@ export async function updateCustomer(customerId: string, data: {
       data: {
         nome: data.nome,
         email: data.email,
+        image: data.image,
         telefone: data.telefone,
         empresa: data.empresa,
         document: data.document,

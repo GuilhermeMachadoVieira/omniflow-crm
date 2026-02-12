@@ -73,9 +73,16 @@ export function CustomerDetailDashboard({ customer }: CustomerDetailDashboardPro
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="text-2xl">
-              {getInitials(customer.nome)}
-            </AvatarFallback>
+            {customer.image ? (
+              <AvatarImage 
+                src={customer.image} 
+                alt={customer.nome} 
+              />
+            ) : (
+              <AvatarFallback className="text-2xl">
+                {getInitials(customer.nome)}
+              </AvatarFallback>
+            )}
           </Avatar>
           <div>
             <h1 className="text-2xl font-bold">{customer.nome}</h1>

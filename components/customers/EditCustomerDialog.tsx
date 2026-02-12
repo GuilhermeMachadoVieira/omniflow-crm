@@ -22,6 +22,7 @@ import { updateCustomer } from "@/app/actions/customers";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ImageUpload } from "@/components/settings/ImageUpload";
 
 interface EditCustomerDialogProps {
   customer: CustomerSafe;
@@ -33,12 +34,14 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [customerImage, setCustomerImage] = useState<string | null>(customer.image || null);
 
   const form = useForm<UpdateCustomerFormData>({
     resolver: zodResolver(updateCustomerSchema),
     defaultValues: {
       nome: customer.nome,
       email: customer.email,
+      image: customer.image || "",
       telefone: customer.telefone || "",
       empresa: customer.empresa || "",
       document: customer.document || "",
@@ -56,6 +59,7 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
         ...data,
         nome: data.nome || customer.nome,
         email: data.email || customer.email,
+        image: customerImage,
         tags: data.tags || customer.tags || [],
       };
 
@@ -73,6 +77,10 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
     });
   }
 
+  const handleImageChange = (newUrl?: string) => {
+    setCustomerImage(newUrl || null);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -87,6 +95,15 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="space-y-4">
+              <Label>Foto do Cliente</Label>
+              <ImageUpload 
+                currentImage={customerImage} 
+                onImageChange={handleImageChange}
+                type="user"
+              />
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome</Label>

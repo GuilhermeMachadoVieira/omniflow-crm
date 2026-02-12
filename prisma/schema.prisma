@@ -70,6 +70,7 @@ model Customer {
   id               String         @id @default(uuid())
   nome             String
   email            String
+  image            String?        // URL da imagem no Supabase Storage
   telefone         String?
   empresa          String?
   document         String?        // CPF/CNPJ

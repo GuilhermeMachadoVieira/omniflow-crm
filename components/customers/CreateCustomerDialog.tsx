@@ -28,6 +28,7 @@ import { createCustomer, type CreateCustomerData } from "@/app/actions/customers
 import { customerSchema, type CustomerFormData } from "@/lib/schemas/customer";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ImageUpload } from "@/components/settings/ImageUpload";
 
 export interface CreateCustomerDialogProps {
   children: React.ReactNode;
@@ -38,12 +39,14 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [customerImage, setCustomerImage] = useState<string | null>(null);
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
       nome: "",
       email: "",
+      image: "",
       telefone: "",
       empresa: "",
       document: "",
@@ -56,11 +59,17 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
 
   async function onSubmit(data: CustomerFormData) {
     startTransition(async () => {
-      const result = await createCustomer(data);
+      const customerData = {
+        ...data,
+        image: customerImage,
+      };
+      
+      const result = await createCustomer(customerData);
 
       if (result.success) {
         toast.success("Cliente criado com sucesso!");
         form.reset();
+        setCustomerImage(null);
         setOpen(false);
         onCreateComplete?.();
         // Atualizar a lista sem recarregar a página
@@ -70,6 +79,10 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
       }
     });
   }
+
+  const handleImageChange = (newUrl?: string) => {
+    setCustomerImage(newUrl || null);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -85,6 +98,15 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="space-y-4">
+              <FormLabel>Foto do Cliente</FormLabel>
+              <ImageUpload 
+                currentImage={customerImage} 
+                onImageChange={handleImageChange}
+                type="user"
+              />
+            </div>
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <FormLabel htmlFor="nome" className="text-right">
                 Nome *

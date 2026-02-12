@@ -5,6 +5,7 @@ export interface CustomerSafe {
   id: string;
   nome: string;
   email: string;
+  image?: string | null;
   telefone?: string;
   empresa?: string;
   document?: string; // CPF/CNPJ
@@ -50,6 +51,7 @@ export type CustomerPrisma = {
   id: string;
   nome: string;
   email: string;
+  image?: string | null;
   telefone?: string | null;
   empresa?: string | null;
   document?: string | null;
@@ -96,6 +98,7 @@ export function sanitizeCustomer(customer: any): CustomerSafe {
     id: customer.id,
     nome: customer.nome,
     email: customer.email,
+    image: customer.image || null,
     telefone: customer.telefone || undefined,
     empresa: customer.empresa || undefined,
     document: customer.document || undefined,

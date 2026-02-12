@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { ImageUpload } from "@/components/settings/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -40,6 +41,8 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
   const [orgForm, setOrgForm] = useState({
     name: organization.name,
   });
+  const [userImage, setUserImage] = useState(user.image);
+  const [orgLogo, setOrgLogo] = useState(organization.logo);
 
   async function handleUpdateProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -54,6 +57,36 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
         router.refresh();
       } else {
         toast.error(result.error || "Erro ao atualizar perfil");
+      }
+    });
+  }
+
+  async function handleProfileImageChange(newUrl?: string) {
+    if (!newUrl) return;
+    
+    startTransition(async () => {
+      const result = await updateProfileImage(newUrl);
+      if (result.success) {
+        setUserImage(newUrl);
+        toast.success("Avatar atualizado com sucesso!");
+        router.refresh();
+      } else {
+        toast.error(result.error || "Erro ao atualizar avatar");
+      }
+    });
+  }
+
+  async function handleOrgLogoChange(newUrl?: string) {
+    if (!newUrl) return;
+    
+    startTransition(async () => {
+      const result = await updateOrganizationLogo(newUrl);
+      if (result.success) {
+        setOrgLogo(newUrl);
+        toast.success("Logo atualizado com sucesso!");
+        router.refresh();
+      } else {
+        toast.error(result.error || "Erro ao atualizar logo");
       }
     });
   }
@@ -115,8 +148,17 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
                 Atualize suas informações pessoais.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <form onSubmit={handleUpdateProfile} className="space-y-4">
+                <div className="space-y-4">
+                  <Label>Avatar do Perfil</Label>
+                  <ImageUpload 
+                    currentImage={userImage} 
+                    onImageChange={handleProfileImageChange}
+                    type="user"
+                  />
+                </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="nome">Nome</Label>
@@ -161,8 +203,17 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
                 Atualize as informações da sua empresa.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <form onSubmit={handleUpdateOrganization} className="space-y-4">
+                <div className="space-y-4">
+                  <Label>Logo da Organização</Label>
+                  <ImageUpload 
+                    currentImage={orgLogo} 
+                    onImageChange={handleOrgLogoChange}
+                    type="organization"
+                  />
+                </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="orgName">Nome da Empresa</Label>
                   <Input
