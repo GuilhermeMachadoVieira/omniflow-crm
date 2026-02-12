@@ -12,6 +12,8 @@ import { ImageUpload } from "@/components/settings/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface SettingsClientProps {
   user: {
@@ -32,7 +34,17 @@ interface SettingsClientProps {
 export function SettingsClient({ user, organization }: SettingsClientProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("profile");
+  const pathname = usePathname();
+
+  // Determinar aba ativa baseada na URL
+  const getActiveTab = () => {
+    if (pathname === "/settings/team") return "team";
+    if (pathname.includes("organization")) return "organization";
+    if (pathname.includes("appearance")) return "appearance";
+    return "profile";
+  };
+  
+  const activeTab = getActiveTab();
 
   // Form states
   const [profileForm, setProfileForm] = useState({
@@ -118,28 +130,35 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
       </div>
 
       <div className="space-y-6">
-        {/* Tabs temporariamente desabilitadas até implementarmos os componentes */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`px-4 py-2 rounded-lg border ${activeTab === "profile" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+        {/* Navegação entre abas */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <Link
+            href="/settings"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "profile" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
             Perfil
-          </button>
-          <button
-            onClick={() => setActiveTab("organization")}
-            className={`px-4 py-2 rounded-lg border ${activeTab === "organization" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+          </Link>
+          <Link
+            href="/settings/organization"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "organization" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
             Organização
-          </button>
-          <button
-            onClick={() => setActiveTab("appearance")}
-            className={`px-4 py-2 rounded-lg border ${activeTab === "appearance" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+          </Link>
+          <Link
+            href="/settings/appearance"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "appearance" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
             Aparência
-          </button>
+          </Link>
+          <Link
+            href="/settings/team"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "team" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >
+            Equipe
+          </Link>
         </div>
 
+        {/* Renderizar conteúdo baseado na rota atual */}
         {activeTab === "profile" && (
           <Card>
             <CardHeader>
@@ -256,6 +275,24 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
                   </p>
                 </div>
                 <ThemeToggle />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === "team" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Equipe</CardTitle>
+              <CardDescription>
+                Gerencie os membros da sua equipe.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">
+                  Carregando gestão de equipe...
+                </p>
               </div>
             </CardContent>
           </Card>
