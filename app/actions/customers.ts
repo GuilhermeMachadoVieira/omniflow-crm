@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/database";
 import { getCurrentUser } from "@/lib/nextauth-client";
 import { CustomerSafe, sanitizeCustomer } from "@/lib/frontend-types";
+import { revalidateCache, CACHE_TAGS, CACHE_DURATIONS } from "@/lib/cache";
+import { Prisma } from "@prisma/client";
 
 export interface CreateCustomerData {
   nome: string;
@@ -45,7 +47,8 @@ export async function createCustomer(data: CreateCustomerData): Promise<{ succes
       },
     });
 
-    // Revalidar cache
+    // Revalidar cache específico
+    revalidateCache.customers(currentUser.organizationId);
     revalidatePath("/customers");
 
     return { success: true };
@@ -57,18 +60,18 @@ export async function createCustomer(data: CreateCustomerData): Promise<{ succes
 
 export async function getCustomers(organizationId: string, query?: string): Promise<CustomerSafe[]> {
   try {
-    const whereClause: any = {
+    const whereClause: Prisma.CustomerWhereInput = {
       organizationId,
     };
 
     // Adicionar filtro de busca se query for fornecida
     if (query && query.trim()) {
       whereClause.OR = [
-        { nome: { contains: query, mode: 'insensitive' } },
-        { email: { contains: query, mode: 'insensitive' } },
-        { empresa: { contains: query, mode: 'insensitive' } },
-        { document: { contains: query, mode: 'insensitive' } },
-        { source: { contains: query, mode: 'insensitive' } },
+        { nome: { contains: query, mode: "insensitive" } },
+        { email: { contains: query, mode: "insensitive" } },
+        { empresa: { contains: query, mode: "insensitive" } },
+        { document: { contains: query, mode: "insensitive" } },
+        { source: { contains: query, mode: "insensitive" } },
         { tags: { hasSome: [query] } },
       ];
     }

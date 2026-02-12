@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { TeamTable } from "@/components/team/TeamTable";
-import { InviteMemberDialog } from "@/components/team/InviteMemberDialog";
+import { TeamHeader } from "@/components/team/TeamHeader";
+import { LazyInviteMemberDialog } from "@/components/team/LazyInviteMemberDialog";
 import { Button } from "@/components/ui/button";
-import { Users, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { TeamMemberSafe } from "@/lib/frontend-types";
 import { AuthUser } from "@/lib/types";
 import { getTeamMembers } from "@/app/actions/team";
@@ -18,18 +19,19 @@ export function TeamClient({ initialMembers, currentUser }: TeamClientProps) {
   const [members, setMembers] = useState<TeamMemberSafe[]>(initialMembers || []);
 
   useEffect(() => {
-    const loadMembers = async () => {
-      if (!initialMembers) {
+    // Só busca dados se não foram fornecidos inicialmente
+    if (!initialMembers) {
+      const loadMembers = async () => {
         try {
           const teamMembers = await getTeamMembers();
           setMembers(teamMembers);
         } catch (error) {
           console.error("Failed to load team members:", error);
         }
-      }
-    };
+      };
 
-    loadMembers();
+      loadMembers();
+    }
   }, [initialMembers]);
 
   // Verificar se o usuário pode convidar membros
@@ -37,30 +39,20 @@ export function TeamClient({ initialMembers, currentUser }: TeamClientProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Gestão de Equipe
-          </h1>
-          <p className="text-muted-foreground">
-            Gerencie os membros da sua organização.
-          </p>
+      <TeamHeader members={members} />
+      
+      {canInviteMembers && (
+        <div className="flex justify-end">
+          <Suspense fallback={null}>
+            <LazyInviteMemberDialog>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Convidar Membro
+              </Button>
+            </LazyInviteMemberDialog>
+          </Suspense>
         </div>
-        
-        {canInviteMembers && (
-          <InviteMemberDialog>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Convidar Membro
-            </Button>
-          </InviteMemberDialog>
-        )}
-      </div>
-
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Users className="h-4 w-4" />
-        <span>{members.length} membro{members.length !== 1 ? "s" : ""}</span>
-      </div>
+      )}
 
       <TeamTable members={members} />
     </div>

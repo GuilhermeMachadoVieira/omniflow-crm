@@ -5,37 +5,31 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
-import { createCustomer } from "@/app/actions/customers";
+import { Plus } from "lucide-react";
+import { createCustomer, type CreateCustomerData } from "@/app/actions/customers";
+import { customerSchema, type CustomerFormData } from "@/lib/schemas/customer";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const customerSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("E-mail inválido"),
-  telefone: z.string().transform(val => val || ""),
-  empresa: z.string().transform(val => val || ""),
-  document: z.string().transform(val => val || ""),
-  address: z.string().transform(val => val || ""),
-  source: z.string().transform(val => val || ""),
-  tags: z.array(z.string()).transform(val => val || []),
-  notes: z.string().transform(val => val || ""),
-});
-
-type CustomerFormData = z.infer<typeof customerSchema>;
-
-interface CreateCustomerDialogProps {
+export interface CreateCustomerDialogProps {
   children: React.ReactNode;
   onCreateComplete?: () => void;
 }
@@ -92,9 +86,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="nome" className="text-right">
+              <FormLabel htmlFor="nome" className="text-right">
                 Nome *
-              </Label>
+              </FormLabel>
               <Input
                 id="nome"
                 {...form.register("nome")}
@@ -108,9 +102,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
+              <FormLabel htmlFor="email" className="text-right">
                 E-mail *
-              </Label>
+              </FormLabel>
               <Input
                 id="email"
                 type="email"
@@ -125,9 +119,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="telefone" className="text-right">
+              <FormLabel htmlFor="telefone" className="text-right">
                 Telefone
-              </Label>
+              </FormLabel>
               <Input
                 id="telefone"
                 {...form.register("telefone")}
@@ -141,9 +135,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="empresa" className="text-right">
+              <FormLabel htmlFor="empresa" className="text-right">
                 Empresa
-              </Label>
+              </FormLabel>
               <Input
                 id="empresa"
                 {...form.register("empresa")}
@@ -157,9 +151,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="document" className="text-right">
+              <FormLabel htmlFor="document" className="text-right">
                 Documento
-              </Label>
+              </FormLabel>
               <Input
                 id="document"
                 {...form.register("document")}
@@ -174,9 +168,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="address" className="text-right">
+              <FormLabel htmlFor="address" className="text-right">
                 Endereço
-              </Label>
+              </FormLabel>
               <Input
                 id="address"
                 {...form.register("address")}
@@ -191,9 +185,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="source" className="text-right">
+              <FormLabel htmlFor="source" className="text-right">
                 Origem
-              </Label>
+              </FormLabel>
               <Input
                 id="source"
                 {...form.register("source")}
@@ -208,9 +202,9 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
               )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="notes" className="text-right">
+              <FormLabel htmlFor="notes" className="text-right">
                 Observações
-              </Label>
+              </FormLabel>
               <Input
                 id="notes"
                 {...form.register("notes")}
@@ -237,7 +231,7 @@ export function CreateCustomerDialog({ children, onCreateComplete }: CreateCusto
             <Button type="submit" disabled={isPending}>
               {isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
                   Criando...
                 </>
               ) : (

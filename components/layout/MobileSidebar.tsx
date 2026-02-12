@@ -61,6 +61,7 @@ export function MobileSidebar() {
         size="sm"
         className="md:hidden fixed top-4 left-4 z-50"
         onClick={() => setIsOpen(true)}
+        aria-label="Abrir menu"
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -101,6 +102,7 @@ export function MobileSidebar() {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-muted rounded-md"
+                  aria-label="Fechar menu"
                 >
                   <X className="h-5 w-5" />
                 </button>

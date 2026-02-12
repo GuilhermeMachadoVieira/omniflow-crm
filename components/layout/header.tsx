@@ -39,7 +39,7 @@ export function Header({ title, description, className, children }: HeaderProps)
             className="w-64 pl-9"
           />
         </div>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label="Notificações">
           <Bell className="h-5 w-5" />
         </Button>
       </div>

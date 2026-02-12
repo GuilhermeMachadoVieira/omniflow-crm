@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { WebVitals } from "@/components/WebVitals";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,6 +12,27 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "OmniFlow CRM",
   description: "Plataforma SaaS B2B Enterprise para gestão de relacionamento e vendas complexas",
+  manifest: "/manifest.json",
+  themeColor: "#3b82f6",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "OmniFlow CRM",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "OmniFlow CRM",
+    title: "OmniFlow CRM",
+    description: "Plataforma SaaS B2B Enterprise para gestão de relacionamento e vendas complexas",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OmniFlow CRM",
+    description: "Plataforma SaaS B2B Enterprise para gestão de relacionamento e vendas complexas",
+  },
 };
 
 export default function RootLayout({
@@ -39,6 +61,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        <WebVitals />
         <Providers>{children}</Providers>
       </body>
     </html>

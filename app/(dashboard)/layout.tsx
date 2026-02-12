@@ -3,6 +3,7 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Header } from "@/components/layout/header";
 import { UserProvider } from "@/components/providers/user-provider";
 import { Toaster } from "@/components/ui/toaster";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function DashboardLayout({
   children,
@@ -22,7 +23,11 @@ export default function DashboardLayout({
         
         <div className="flex flex-1 flex-col pl-0 md:pl-64">
           <Header />
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-6">
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </main>
         </div>
       </div>
       <Toaster />

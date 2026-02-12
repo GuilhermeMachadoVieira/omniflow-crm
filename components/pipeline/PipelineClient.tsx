@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { PipelineBoard } from "@/components/pipeline/PipelineBoard";
-import { CreateOpportunityDialog } from "@/components/pipeline/CreateOpportunityDialog";
+import { LazyCreateOpportunityDialog } from "@/components/pipeline/LazyCreateOpportunityDialog";
+import { PipelineSkeleton } from "@/components/pipeline/PipelineSkeleton";
 import { Button } from "@/components/ui/button";
 import { FilterSelect } from "@/components/ui/filter-select";
-import { Plus } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { Plus, TrendingUp } from "lucide-react";
 import { PipelineColumnSafe } from "@/lib/frontend-types";
 import { CustomerSafe } from "@/lib/frontend-types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -27,6 +30,12 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (initialColumns && initialCustomers) {
+      setColumns(initialColumns);
+      setCustomers(initialCustomers);
+      return;
+    }
+
     const loadData = async () => {
       if (!initialColumns || !initialCustomers) {
         setIsLoading(true);
@@ -47,7 +56,7 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
     };
 
     loadData();
-  }, [searchQuery, priorityFilter]);
+  }, [initialColumns, initialCustomers, searchQuery, priorityFilter]);
 
   const handleCreateComplete = () => {
     // A lista será atualizada pelo router.refresh() no dialog
@@ -96,20 +105,24 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
             options={priorityOptions}
             className="w-32"
           />
-          <CreateOpportunityDialog 
-            customers={customers} 
-            columns={columns}
-            onCreateComplete={handleCreateComplete}
-          >
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Oportunidade
-            </Button>
-          </CreateOpportunityDialog>
+          <Suspense fallback={null}>
+            <LazyCreateOpportunityDialog 
+              customers={customers} 
+              columns={columns}
+              onCreateComplete={handleCreateComplete}
+            >
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Oportunidade
+              </Button>
+            </LazyCreateOpportunityDialog>
+          </Suspense>
         </div>
       </div>
 
-      {columns.length > 0 ? (
+      {isLoading ? (
+        <PipelineSkeleton />
+      ) : columns.length > 0 ? (
         <PipelineBoard columns={columns} />
       ) : (
         <div className="text-center py-12">

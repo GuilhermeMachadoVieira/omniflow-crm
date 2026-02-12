@@ -3,6 +3,20 @@
 import { prisma } from "@/lib/database";
 import { getCurrentUser } from "@/lib/nextauth-client";
 
+type RecentSaleItem = {
+  id: string;
+  title: string;
+  value: number;
+  createdAt: Date;
+  customerName: string;
+  userName: string;
+};
+
+type MonthlyRevenueItem = {
+  month: string;
+  revenue: number;
+};
+
 export async function getDashboardMetrics() {
   try {
     const currentUser = await getCurrentUser();
@@ -11,7 +25,8 @@ export async function getDashboardMetrics() {
         totalRevenue: 0,
         totalCustomers: 0,
         totalOpportunities: 0,
-        recentSales: [],
+        recentSales: [] as RecentSaleItem[],
+        monthlyRevenue: [] as MonthlyRevenueItem[],
       };
     }
 
@@ -56,19 +71,19 @@ export async function getDashboardMetrics() {
         orderBy: {
           sortOrder: "desc",
         },
-      }).then((columns: any) => {
+      }).then((columns): RecentSaleItem[] => {
         // Encontrar a última coluna (maior sortOrder)
         const lastColumn = columns[0];
         if (!lastColumn) return [];
         
         // Retornar oportunidades da última coluna como "vendas"
-        return lastColumn.opportunities.map((opp: any) => ({
+        return lastColumn.opportunities.map((opp): RecentSaleItem => ({
           id: opp.id,
           title: opp.title,
           value: Number(opp.value),
           createdAt: opp.createdAt,
-          customerName: "Cliente não identificado", // TODO: Adicionar relacionamento
-          userName: "Vendedor não identificado", // TODO: Adicionar relacionamento
+          customerName: 'N/A', // Não temos customer no OpportunitySafe
+          userName: 'N/A', // Não temos user no OpportunitySafe
         }));
       }),
       
@@ -84,19 +99,16 @@ export async function getDashboardMetrics() {
         _sum: {
           value: true,
         },
-      }).then((groups: any) => {
-        // Agrupar por mês e calcular totais
-        const monthlyData = groups.map((group: any) => ({
-          month: new Date(group.createdAt).toLocaleDateString('pt-BR', { month: 'short' }),
+      }).then((groups): MonthlyRevenueItem[] => {
+        return groups.map((group): MonthlyRevenueItem => ({
+          month: new Date(group.createdAt).toLocaleDateString("pt-BR", { month: "short" }),
           revenue: Number(group._sum.value || 0),
         }));
-        
-        return monthlyData;
       }),
     ]);
 
     // Calcular receita total (soma de oportunidades na última coluna)
-    const totalRevenue = recentSales.reduce((sum: any, sale: any) => sum + sale.value, 0);
+    const totalRevenue = recentSales.reduce((sum, sale) => sum + sale.value, 0);
 
     return {
       totalRevenue,
@@ -111,8 +123,8 @@ export async function getDashboardMetrics() {
       totalRevenue: 0,
       totalCustomers: 0,
       totalOpportunities: 0,
-      recentSales: [],
-      monthlyRevenue: [],
+      recentSales: [] as RecentSaleItem[],
+      monthlyRevenue: [] as MonthlyRevenueItem[],
     };
   }
 }

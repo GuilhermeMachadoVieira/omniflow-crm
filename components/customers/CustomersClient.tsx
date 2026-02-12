@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { CustomerTableWithSelection } from "@/components/customers/CustomerTableWithSelection";
 import { BulkActions } from "@/components/customers/BulkActions";
 import { CustomerFilters } from "@/components/customers/CustomerFilters";
-import { CreateCustomerDialog } from "@/components/customers/CreateCustomerDialog";
+import { LazyCreateCustomerDialog } from "@/components/customers/LazyCreateCustomerDialog";
 import { ExportButton } from "@/components/customers/ExportButton";
+import { CustomerTableSkeleton } from "@/components/customers/CustomerTableSkeleton";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -64,12 +65,14 @@ export function CustomersClient({ initialCustomers, searchQuery }: CustomersClie
         
         <div className="flex items-center gap-2">
           {user && <ExportButton organizationId={user.organizationId} />}
-          <CreateCustomerDialog>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Cliente
-            </Button>
-          </CreateCustomerDialog>
+          <Suspense fallback={null}>
+            <LazyCreateCustomerDialog>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Cliente
+              </Button>
+            </LazyCreateCustomerDialog>
+          </Suspense>
         </div>
       </div>
 
@@ -78,9 +81,7 @@ export function CustomersClient({ initialCustomers, searchQuery }: CustomersClie
 
       {/* Loading State */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <LoadingSpinner text="Carregando clientes..." size="lg" />
-        </div>
+        <CustomerTableSkeleton />
       ) : (
         <>
           {/* Bulk Actions */}

@@ -24,6 +24,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  console.log('=== LOGIN PAGE LOADED ===');
+
   const {
     register,
     handleSubmit,
@@ -36,6 +38,8 @@ export default function LoginPage() {
   async function onSubmit(data: LoginFormData) {
     setIsLoading(true);
     setError("");
+    console.log('=== LOGIN SUBMIT ===');
+    console.log('Form data:', data);
 
     try {
       const result = await signIn("credentials", {
@@ -44,19 +48,31 @@ export default function LoginPage() {
         redirect: false,
       });
 
+      console.log('SignIn result:', result);
+
       if (result?.ok) {
+        console.log('Login successful, redirecting...');
         router.push("/");
         router.refresh();
         return;
       }
 
+      console.log('Login failed:', result?.error);
       setError("E-mail ou senha incorretos");
     } catch (error) {
+      console.error('Login error:', error);
       setError("Erro ao fazer login");
     } finally {
       setIsLoading(false);
     }
   }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    console.log('=== FORM SUBMIT INTERCEPTED ===');
+    e.preventDefault();
+    console.log('Default prevented');
+    handleSubmit(onSubmit)(e);
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -96,7 +112,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -134,9 +150,13 @@ export default function LoginPage() {
             </div>
 
             <Button
-              type="submit"
+              type="button"
               className="w-full"
               disabled={isLoading}
+              onClick={() => {
+                console.log('=== BUTTON CLICKED ===');
+                handleSubmit(onSubmit)();
+              }}
             >
               {isLoading ? (
                 <>

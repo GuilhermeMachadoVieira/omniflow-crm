@@ -155,7 +155,7 @@ export function TeamManagementClient({
                   com as instruções de acesso.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit(onSubmit)} method="POST">
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
                     <Label htmlFor="nome">Nome completo</Label>

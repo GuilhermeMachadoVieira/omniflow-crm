@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/database";
 import { getCurrentUser } from "@/lib/nextauth-client";
 import { PipelineColumnSafe, sanitizePipelineColumn } from "@/lib/frontend-types";
+import { Prisma, Priority } from "@prisma/client";
 
 export async function updateOpportunityStage(
   opportunityId: string,
@@ -166,7 +167,7 @@ export async function updateOpportunity(opportunityId: string, data: {
       data: {
         ...(data.title && { title: data.title }),
         ...(data.value && { value: data.value }),
-        ...(data.priority && { priority: data.priority as any }),
+        ...(data.priority && { priority: data.priority as Priority }),
         ...(data.probability && { probability: data.probability }),
         ...(data.expectedCloseDate && { expectedCloseDate: new Date(data.expectedCloseDate) }),
       },
@@ -190,12 +191,12 @@ export async function getPipelineData(organizationId: string, query?: string, pr
     }
 
     // Construir where clause para busca
-    const whereClause: any = {
+    const whereClause: Prisma.PipelineColumnWhereInput = {
       organizationId: currentUser.organizationId,
     };
 
     // Construir where clause para oportunidades
-    const opportunityWhere: any = {};
+    const opportunityWhere: Prisma.OpportunityWhereInput = {};
 
     // Se houver query, adicionar filtro nas oportunidades
     if (query && query.trim()) {
@@ -206,7 +207,7 @@ export async function getPipelineData(organizationId: string, query?: string, pr
 
     // Se houver filtro de prioridade, adicionar filtro
     if (priorityFilter && priorityFilter.trim()) {
-      opportunityWhere.priority = priorityFilter;
+      opportunityWhere.priority = priorityFilter as Priority;
     }
 
     // Se houver filtros de oportunidades, adicionar ao whereClause

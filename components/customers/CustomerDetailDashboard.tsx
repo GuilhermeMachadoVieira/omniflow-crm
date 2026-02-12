@@ -9,7 +9,8 @@ import { CustomerInfoCard } from "./CustomerInfoCard";
 import { CustomerOpportunitiesCard } from "./CustomerOpportunitiesCard";
 import { AddActivityForm } from "../activities/AddActivityForm";
 import { ActivityFeed } from "../activities/ActivityFeed";
-import { EditCustomerDialog } from "./EditCustomerDialog";
+import { Suspense } from "react";
+import { LazyEditCustomerDialog } from "./LazyEditCustomerDialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -91,12 +92,14 @@ export function CustomerDetailDashboard({ customer }: CustomerDetailDashboardPro
           </div>
         </div>
         
-        <EditCustomerDialog customer={customer} onUpdateComplete={handleUpdateComplete}>
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" />
-            Editar
-          </Button>
-        </EditCustomerDialog>
+        <Suspense fallback={null}>
+          <LazyEditCustomerDialog customer={customer} onUpdateComplete={handleUpdateComplete}>
+            <Button variant="outline">
+              <Edit className="mr-2 h-4 w-4" />
+              Editar
+            </Button>
+          </LazyEditCustomerDialog>
+        </Suspense>
         
         <AlertDialog>
           <AlertDialogTrigger asChild>

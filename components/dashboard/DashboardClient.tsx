@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { OverviewCard } from "@/components/dashboard/Overview";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { RecentSales } from "@/components/dashboard/RecentSales";
+import { DateFilters } from "@/components/dashboard/DateFilters";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { getDashboardMetrics } from "@/app/actions/dashboard";
 import { User, Plus, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,8 @@ interface DashboardMetrics {
 export function DashboardClient() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [datePreset, setDatePreset] = useState<string>("thisMonth");
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined } | undefined>();
 
   useEffect(() => {
     const loadMetrics = async () => {
@@ -39,29 +43,7 @@ export function DashboardClient() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Visão geral do seu pipeline e desempenho de vendas.
-            </p>
-          </div>
-        </div>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
-          ))}
-        </div>
-        
-        <div className="h-64 bg-muted animate-pulse rounded-lg" />
-        <div className="h-96 bg-muted animate-pulse rounded-lg" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (!metrics) {
@@ -100,6 +82,13 @@ export function DashboardClient() {
           </Link>
         </div>
       </div>
+
+      {/* Date Filters */}
+      <DateFilters 
+        onDateRangeChange={setDateRange}
+        onPresetChange={setDatePreset}
+        currentPreset={datePreset}
+      />
 
       {/* Cards de Métricas */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

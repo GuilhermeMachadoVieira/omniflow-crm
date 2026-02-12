@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateCustomerSchema, UpdateCustomerFormData } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +21,7 @@ import { CustomerSafe } from "@/lib/frontend-types";
 import { updateCustomer } from "@/app/actions/customers";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface EditCustomerDialogProps {
   customer: CustomerSafe;
@@ -27,49 +31,47 @@ interface EditCustomerDialogProps {
 
 export function EditCustomerDialog({ customer, children, onUpdateComplete }: EditCustomerDialogProps) {
   const [open, setOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [formData, setFormData] = useState({
-    nome: customer.nome,
-    email: customer.email,
-    telefone: customer.telefone || "",
-    empresa: customer.empresa || "",
-    document: customer.document || "",
-    address: customer.address || "",
-    source: customer.source || "",
-    tags: (customer.tags || []).join(", "),
-    notes: customer.notes || "",
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const form = useForm<UpdateCustomerFormData>({
+    resolver: zodResolver(updateCustomerSchema),
+    defaultValues: {
+      nome: customer.nome,
+      email: customer.email,
+      telefone: customer.telefone || "",
+      empresa: customer.empresa || "",
+      document: customer.document || "",
+      address: customer.address || "",
+      source: customer.source || "",
+      tags: customer.tags || [],
+      notes: customer.notes || "",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsPending(true);
+  async function onSubmit(data: UpdateCustomerFormData) {
+    startTransition(async () => {
+      // Garantir que campos obrigatórios tenham valores
+      const submitData = {
+        ...data,
+        nome: data.nome || customer.nome,
+        email: data.email || customer.email,
+        tags: data.tags || customer.tags || [],
+      };
 
-    try {
-      const result = await updateCustomer(customer.id, {
-        nome: formData.nome,
-        email: formData.email,
-        telefone: formData.telefone || undefined,
-        empresa: formData.empresa || undefined,
-        document: formData.document || undefined,
-        address: formData.address || undefined,
-        source: formData.source || undefined,
-        tags: formData.tags ? formData.tags.split(",").map((tag: string) => tag.trim()).filter(Boolean) : [],
-        notes: formData.notes || undefined,
-      });
+      const result = await updateCustomer(customer.id, submitData);
 
       if (result.success) {
         toast.success("Cliente atualizado com sucesso!");
+        form.reset();
         setOpen(false);
         onUpdateComplete?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Erro ao atualizar cliente");
       }
-    } catch (error) {
-      toast.error("Erro ao atualizar cliente");
-    } finally {
-      setIsPending(false);
-    }
-  };
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -77,35 +79,43 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
         {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Editar Cliente</DialogTitle>
-          <DialogDescription>
-            Atualize as informações do cliente.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>
+              Atualize as informações do cliente.
+            </DialogDescription>
+          </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome</Label>
                 <Input
                   id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                  {...form.register("nome")}
                   disabled={isPending}
                   required
                 />
+                {form.formState.errors.nome && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.nome.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  {...form.register("email")}
                   disabled={isPending}
                   required
                 />
+                {form.formState.errors.email && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
             
@@ -114,19 +124,28 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
                 <Label htmlFor="telefone">Telefone</Label>
                 <Input
                   id="telefone"
-                  value={formData.telefone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
+                  {...form.register("telefone")}
                   disabled={isPending}
+                  placeholder="(11) 99999-9999"
                 />
+                {form.formState.errors.telefone && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.telefone.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="empresa">Empresa</Label>
                 <Input
                   id="empresa"
-                  value={formData.empresa}
-                  onChange={(e) => setFormData(prev => ({ ...prev, empresa: e.target.value }))}
+                  {...form.register("empresa")}
                   disabled={isPending}
                 />
+                {form.formState.errors.empresa && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.empresa.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -135,21 +154,29 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
                 <Label htmlFor="document">Documento</Label>
                 <Input
                   id="document"
-                  value={formData.document}
-                  onChange={(e) => setFormData(prev => ({ ...prev, document: e.target.value }))}
+                  {...form.register("document")}
                   disabled={isPending}
                   placeholder="CPF/CNPJ"
                 />
+                {form.formState.errors.document && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.document.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="source">Origem</Label>
                 <Input
                   id="source"
-                  value={formData.source}
-                  onChange={(e) => setFormData(prev => ({ ...prev, source: e.target.value }))}
+                  {...form.register("source")}
                   disabled={isPending}
                   placeholder="Google, Indicação, Instagram..."
                 />
+                {form.formState.errors.source && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.source.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -157,34 +184,46 @@ export function EditCustomerDialog({ customer, children, onUpdateComplete }: Edi
               <Label htmlFor="address">Endereço</Label>
               <Input
                 id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                {...form.register("address")}
                 disabled={isPending}
                 placeholder="Endereço completo"
               />
+              {form.formState.errors.address && (
+                <p className="text-sm text-red-600">
+                  {form.formState.errors.address.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="tags">Tags</Label>
               <Input
                 id="tags"
-                value={formData.tags}
-                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+                {...form.register("tags")}
                 disabled={isPending}
                 placeholder="Tags separadas por vírgula"
               />
+              {form.formState.errors.tags && (
+                <p className="text-sm text-red-600">
+                  {form.formState.errors.tags.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="notes">Observações</Label>
               <Textarea
                 id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                {...form.register("notes")}
                 disabled={isPending}
                 placeholder="Observações gerais sobre o cliente"
                 rows={3}
               />
+              {form.formState.errors.notes && (
+                <p className="text-sm text-red-600">
+                  {form.formState.errors.notes.message}
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>

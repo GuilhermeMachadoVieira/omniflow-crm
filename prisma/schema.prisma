@@ -34,7 +34,7 @@ model Organization {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  logo      String?  // Logo em Base64
+  logo      String?  // URL da imagem no Supabase Storage
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -53,7 +53,7 @@ model User {
   email          String   @unique
   passwordHash   String   @map("password_hash")
   role           Role     @default(MEMBER)
-  image          String?  // Avatar em Base64
+  image          String?  // URL da imagem no Supabase Storage
   organizationId String   @map("organization_id")
   createdAt      DateTime @default(now()) @map("created_at")
 
@@ -61,6 +61,8 @@ model User {
   customers    Customer[]
   activities   Activity[]
 
+  @@index([organizationId])
+  @@index([email])
   @@map("users")
 }
 
@@ -86,6 +88,11 @@ model Customer {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   activities   Activity[]
 
+  @@index([organizationId])
+  @@index([organizationId, email])
+  @@index([organizationId, status])
+  @@index([organizationId, userId])
+  @@index([organizationId, createdAt])
   @@map("customers")
 }
 
@@ -99,6 +106,8 @@ model PipelineColumn {
   organization  Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   opportunities Opportunity[]
 
+  @@index([organizationId])
+  @@index([organizationId, sortOrder])
   @@map("pipeline_columns")
 }
 
@@ -116,6 +125,10 @@ model Opportunity {
   column       PipelineColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
   organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
+  @@index([organizationId, columnId])
+  @@index([organizationId, priority])
+  @@index([organizationId, createdAt])
   @@map("opportunities")
 }
 
@@ -133,5 +146,9 @@ model Activity {
   user        User     @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
+  @@index([organizationId, customerId])
+  @@index([organizationId, userId])
+  @@index([organizationId, createdAt])
   @@map("activities")
 }

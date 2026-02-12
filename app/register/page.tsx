@@ -122,7 +122,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} method="POST" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="nome">Nome completo</Label>
               <Input

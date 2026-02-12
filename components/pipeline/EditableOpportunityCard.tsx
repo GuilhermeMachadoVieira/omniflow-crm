@@ -85,10 +85,10 @@ export function EditableOpportunityCard({ opportunity, onUpdate }: EditableOppor
               placeholder="Título da oportunidade"
             />
             <div className="flex gap-1">
-              <Button size="sm" onClick={handleSave}>
+              <Button size="sm" onClick={handleSave} aria-label="Salvar">
                 <Save className="h-3 w-3" />
               </Button>
-              <Button size="sm" variant="outline" onClick={handleCancel}>
+              <Button size="sm" variant="outline" onClick={handleCancel} aria-label="Cancelar">
                 <X className="h-3 w-3" />
               </Button>
             </div>

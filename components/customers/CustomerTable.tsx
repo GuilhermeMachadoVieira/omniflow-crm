@@ -130,6 +130,7 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
                   variant="ghost"
                   size="sm"
                   asChild
+                  aria-label="Ver detalhes do cliente"
                 >
                   <Link href={`/customers/${customer.id}`}>
                     <ExternalLink className="h-4 w-4" />
