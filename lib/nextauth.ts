@@ -9,6 +9,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   debug: process.env.NODE_ENV === 'development',
   providers: [
@@ -58,7 +59,7 @@ export const authOptions: NextAuthOptions = {
           return result;
         } catch (error) {
           console.error('Error in authorize:', error);
-          return null;
+          throw new Error('Erro ao autenticar usuário');
         }
       },
     }),

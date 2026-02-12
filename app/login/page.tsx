@@ -50,7 +50,13 @@ export default function LoginPage() {
         return;
       }
 
-      setError("E-mail ou senha incorretos");
+      if (result?.error) {
+        setError(result?.error === "CredentialsSignin" 
+          ? "E-mail ou senha incorretos" 
+          : "Erro ao fazer login");
+      } else {
+        setError("E-mail ou senha incorretos");
+      }
     } catch (error) {
       setError("Erro ao fazer login");
     } finally {
