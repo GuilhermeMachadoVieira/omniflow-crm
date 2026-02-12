@@ -38,8 +38,9 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
 
   // Determinar aba ativa baseada na URL
   const getActiveTab = () => {
-    if (pathname === "/settings/team") return "team";
     if (pathname.includes("organization")) return "organization";
+    if (pathname.includes("password")) return "password";
+    if (pathname.includes("security")) return "security";
     if (pathname.includes("appearance")) return "appearance";
     return "profile";
   };
@@ -145,16 +146,22 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
             Organização
           </Link>
           <Link
+            href="/settings/password"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "password" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >
+            Senha
+          </Link>
+          <Link
+            href="/settings/security"
+            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "security" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >
+            Segurança
+          </Link>
+          <Link
             href="/settings/appearance"
             className={`px-4 py-2 rounded-lg border text-center ${activeTab === "appearance" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
             Aparência
-          </Link>
-          <Link
-            href="/settings/team"
-            className={`px-4 py-2 rounded-lg border text-center ${activeTab === "team" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-          >
-            Equipe
           </Link>
         </div>
 
@@ -275,24 +282,6 @@ export function SettingsClient({ user, organization }: SettingsClientProps) {
                   </p>
                 </div>
                 <ThemeToggle />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {activeTab === "team" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Equipe</CardTitle>
-              <CardDescription>
-                Gerencie os membros da sua equipe.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">
-                  Carregando gestão de equipe...
-                </p>
               </div>
             </CardContent>
           </Card>

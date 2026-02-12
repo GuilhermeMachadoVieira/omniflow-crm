@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { passwordSchema } from "@/lib/password-policy";
 import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { PasswordStrength, PasswordRequirements } from "@/components/ui/PasswordStrength";
 
 const loginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+  password: passwordSchema,
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -28,6 +30,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -137,6 +140,8 @@ export default function LoginPage() {
                   {errors.password.message}
                 </p>
               )}
+              <PasswordStrength password={watch("password") || ""} />
+              <PasswordRequirements password={watch("password") || ""} />
             </div>
 
             <Button

@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/nextauth-client";
-import { TeamManagement } from "@/components/settings/TeamManagement";
+import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
-export default async function TeamPage() {
+export default async function SecuritySettingsPage() {
   const user = await getCurrentUser();
   if (!user || !user.id) {
     redirect("/login");
@@ -16,7 +16,7 @@ export default async function TeamPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-muted-foreground">
-          Gerencie os membros da sua equipe.
+          Gerencie a segurança e privacidade da sua conta.
         </p>
       </div>
 
@@ -37,19 +37,19 @@ export default async function TeamPage() {
           </Link>
           <Link
             href="/settings/security"
-            className="px-4 py-2 rounded-lg border text-center bg-muted text-muted-foreground hover:bg-muted/80"
+            className="px-4 py-2 rounded-lg border text-center bg-primary text-primary-foreground"
           >
             Segurança
           </Link>
           <Link
             href="/settings/team"
-            className="px-4 py-2 rounded-lg border text-center bg-primary text-primary-foreground"
+            className="px-4 py-2 rounded-lg border text-center bg-muted text-muted-foreground hover:bg-muted/80"
           >
             Equipe
           </Link>
         </div>
 
-        <TeamManagement />
+        <SecuritySettings user={user} />
       </div>
     </div>
   );

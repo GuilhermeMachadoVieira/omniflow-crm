@@ -1,11 +1,14 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
+import { authRateLimit, getClientIdentifier, checkRateLimit } from "@/lib/rate-limit";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 horas
+    updateAge: 60 * 60, // 1 hora para atualizar sessão
   },
   pages: {
     signIn: "/login",
@@ -28,6 +31,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          // Rate limiting para login
+          const rateLimitResult = checkRateLimit(authRateLimit, email);
+          if (!rateLimitResult.success) {
+            throw new Error(rateLimitResult.error || "Muitas tentativas de login");
+          }
           const { prisma } = await import("@/lib/database");
 
           const user = await prisma.user.findUnique({

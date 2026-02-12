@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { authRateLimit, registerRateLimit, getClientIdentifier, checkRateLimit } from "@/lib/rate-limit";
 
 // Defina aqui todas as rotas que podem ser acessadas SEM login
 const PUBLIC_PATHS = ["/login", "/register"];
@@ -14,19 +15,50 @@ const PROTECTED_ROUTES = {
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const ip = request.headers.get('x-forwarded-for') || 
-             request.headers.get('x-real-ip') || 
-             'unknown';
+  const identifier = getClientIdentifier(request);
 
   console.log('=== MIDDLEWARE DEBUG ===');
   console.log('Path:', path);
   console.log('Method:', request.method);
-  console.log('IP:', ip);
+  console.log('Identifier:', identifier);
 
   // Ignorar preflight
   if (request.method === "OPTIONS") {
     console.log('Ignoring OPTIONS request');
     return NextResponse.next();
+  }
+
+  // Rate limiting para rotas de auth
+  if (path === '/login' && request.method === 'POST') {
+    const rateLimitResult = checkRateLimit(authRateLimit, identifier);
+    if (!rateLimitResult.success) {
+      return new NextResponse(
+        JSON.stringify({ error: rateLimitResult.error }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            ...rateLimitResult.headers,
+          },
+        }
+      );
+    }
+  }
+
+  if (path === '/register' && request.method === 'POST') {
+    const rateLimitResult = checkRateLimit(registerRateLimit, identifier);
+    if (!rateLimitResult.success) {
+      return new NextResponse(
+        JSON.stringify({ error: rateLimitResult.error }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            ...rateLimitResult.headers,
+          },
+        }
+      );
+    }
   }
   
   // Verifica se a rota atual está na lista de públicas
@@ -81,7 +113,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   response.headers.set('X-RateLimit-Limit', '100');
   response.headers.set('X-RateLimit-Remaining', 'unknown');
-  response.headers.set('X-RateLimit-By', ip);
+  response.headers.set('X-RateLimit-By', identifier);
 
   return response;
 }

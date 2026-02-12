@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/database";
 import * as bcrypt from "bcrypt";
+import { z } from "zod";
+import { passwordSchema } from "@/lib/password-policy";
 
 interface RegisterData {
   nome: string;
@@ -9,6 +11,13 @@ interface RegisterData {
   password: string;
   empresa: string;
 }
+
+const registerSchema = z.object({
+  nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Informe um e-mail válido"),
+  password: passwordSchema,
+  empresa: z.string().min(2, "Nome da empresa deve ter pelo menos 2 caracteres"),
+});
 
 function generateSlug(name: string): string {
   return name
@@ -22,16 +31,12 @@ function generateSlug(name: string): string {
 
 export async function registerAction(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
+    const result = registerSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0].message };
+    }
+
     const { nome, email, password, empresa } = data;
-
-    // Validar dados básicos
-    if (!nome || !email || !password || !empresa) {
-      return { success: false, error: "Todos os campos são obrigatórios" };
-    }
-
-    if (password.length < 6) {
-      return { success: false, error: "A senha deve ter pelo menos 6 caracteres" };
-    }
 
     // Verificar se email já existe
     const existingUser = await prisma.user.findFirst({

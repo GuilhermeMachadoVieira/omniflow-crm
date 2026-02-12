@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { passwordSchema } from "@/lib/password-policy";
 import { Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +13,12 @@ import { Label } from "@/components/ui/label";
 import { registerAction } from "@/app/actions/register";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { PasswordStrength, PasswordRequirements } from "@/components/ui/PasswordStrength";
 
 const registerSchema = z.object({
   nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Informe um e-mail válido"),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+  password: passwordSchema,
   empresa: z.string().min(2, "Nome da empresa deve ter pelo menos 2 caracteres"),
 });
 
@@ -32,6 +34,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: { 
@@ -189,6 +192,8 @@ export default function RegisterPage() {
                   {errors.password.message}
                 </p>
               )}
+              <PasswordStrength password={watch("password") || ""} />
+              <PasswordRequirements password={watch("password") || ""} />
             </div>
 
             <Button
