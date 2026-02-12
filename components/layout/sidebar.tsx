@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,8 +9,6 @@ import {
   Building2,
   Calendar,
   Phone,
-  ChevronDown,
-  UsersRound,
 } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +23,6 @@ export function Sidebar() {
   const { user } = useCurrentUser();
   const pathname = usePathname();
   const router = useRouter();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const getInitials = (name: string) => {
     return name
@@ -84,14 +80,6 @@ const navigation: NavigationItem[] = [
       href: "/settings",
       icon: Settings,
       requiredRole: ["OWNER", "ADMIN"],
-      subItems: [
-        {
-          title: "Equipe",
-          href: "/settings/team",
-          icon: UsersRound,
-          requiredRole: ["OWNER", "ADMIN"],
-        },
-      ],
     },
   ];
 
@@ -117,56 +105,6 @@ const navigation: NavigationItem[] = [
         <ul className="space-y-2">
           {navigation.map((item) => {
             const canViewItem = !item.requiredRole || (user && item.requiredRole.includes(user.role));
-            
-            if (item.subItems) {
-              // Render menu com submenu
-              return (
-                <li key={item.href}>
-                  <div className="space-y-1">
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
-                        isActive(item.href) ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                        !canViewItem && "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {item.title}
-                      <ChevronDown className={cn(
-                        "h-4 w-4 transition-transform",
-                        isActive(item.href) ? "rotate-180" : ""
-                      )} />
-                    </Link>
-                    
-                    {/* Submenu items */}
-                    {canViewItem && (
-                      <ul className="ml-8 mt-1 space-y-1">
-                        {item.subItems.map((subItem) => {
-                          const canViewSubItem = !subItem.requiredRole || (user && subItem.requiredRole.includes(user.role));
-                          
-                          return (
-                            <li key={subItem.href}>
-                              <Link
-                                href={subItem.href}
-                                className={cn(
-                                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
-                                  isActive(subItem.href) ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                                  !canViewSubItem && "opacity-50 cursor-not-allowed"
-                                )}
-                              >
-                                <subItem.icon className="h-4 w-4" />
-                                {subItem.title}
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </li>
-              );
-            }
             
             return (
               <li key={item.href}>

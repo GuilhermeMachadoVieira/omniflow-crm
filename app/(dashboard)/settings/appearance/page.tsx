@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/nextauth-client";
-import { SettingsClient } from "@/components/settings/SettingsClient";
+import { AppearanceClient } from "@/components/settings/AppearanceClient";
 
 export const dynamic = 'force-dynamic';
 
@@ -45,5 +45,5 @@ export default async function AppearanceSettingsPage() {
     redirect("/dashboard");
   }
 
-  return <SettingsClient user={userData} organization={orgData} />;
+  return <AppearanceClient user={userData} organization={orgData} />;
 }
