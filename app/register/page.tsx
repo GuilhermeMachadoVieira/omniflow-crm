@@ -14,6 +14,7 @@ import { registerAction } from "@/app/actions/register";
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { PasswordStrength, PasswordRequirements } from "@/components/ui/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 const registerSchema = z.object({
   nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -29,6 +30,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -178,15 +180,29 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                disabled={isLoading}
-                {...register("password")}
-                className={errors.password ? "border-destructive" : ""}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  disabled={isLoading}
+                  {...register("password")}
+                  className={errors.password ? "border-destructive pr-10" : "pr-10"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-sm text-destructive">
                   {errors.password.message}
