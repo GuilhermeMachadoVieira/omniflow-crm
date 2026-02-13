@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import Link from "next/link";
+import { SettingsNavigation } from "@/components/settings/SettingsNavigation";
 
 interface AppearanceClientProps {
   user: {
@@ -24,20 +24,14 @@ export function AppearanceClient({ user, organization }: AppearanceClientProps) 
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Link 
-            href="/settings" 
-            className="text-muted-foreground hover:text-foreground text-sm"
-          >
-            Configurações
-          </Link>
-          <span className="text-muted-foreground text-sm">/</span>
-          <h1 className="text-2xl font-semibold tracking-tight">Aparência</h1>
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-muted-foreground">
           Personalize o visual do sistema.
         </p>
       </div>
+
+      <div className="space-y-6">
+        <SettingsNavigation currentPath="/settings/appearance" />
 
       <Card>
         <CardHeader>
@@ -57,7 +51,8 @@ export function AppearanceClient({ user, organization }: AppearanceClientProps) 
             <ThemeToggle />
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

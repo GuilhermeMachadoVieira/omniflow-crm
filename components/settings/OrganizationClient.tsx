@@ -10,7 +10,7 @@ import { ImageUpload } from "@/components/settings/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { SettingsNavigation } from "@/components/settings/SettingsNavigation";
 
 interface OrganizationClientProps {
   user: {
@@ -73,20 +73,14 @@ export function OrganizationClient({ user, organization }: OrganizationClientPro
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Link 
-            href="/settings" 
-            className="text-muted-foreground hover:text-foreground text-sm"
-          >
-            Configurações
-          </Link>
-          <span className="text-muted-foreground text-sm">/</span>
-          <h1 className="text-2xl font-semibold tracking-tight">Organização</h1>
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-muted-foreground">
-          Atualize as informações da sua empresa.
+          Gerencie as informações da sua organização.
         </p>
       </div>
+
+      <div className="space-y-6">
+        <SettingsNavigation currentPath="/settings/organization" />
 
       <Card>
         <CardHeader>
@@ -128,7 +122,8 @@ export function OrganizationClient({ user, organization }: OrganizationClientPro
             </Button>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
