@@ -1,6 +1,8 @@
 "use client";
 
-import { lazy } from "react";
+import { useState, lazy } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const CreateCustomerDialogLazy = lazy(() =>
   import("./CreateCustomerDialog").then((m) => ({
@@ -13,8 +15,24 @@ export interface LazyCreateCustomerDialogProps {
   onCreateComplete?: () => void;
 }
 
-export function LazyCreateCustomerDialog(props: LazyCreateCustomerDialogProps) {
+export function LazyCreateCustomerDialog({ children, onCreateComplete }: LazyCreateCustomerDialogProps) {
+  const [open, setOpen] = useState(false);
+
+  const handleSuccess = () => {
+    setOpen(false);
+    onCreateComplete?.();
+  };
+
   return (
-    <CreateCustomerDialogLazy {...props} />
+    <>
+      <div onClick={() => setOpen(true)}>
+        {children}
+      </div>
+      <CreateCustomerDialogLazy
+        open={open}
+        onOpenChange={setOpen}
+        onSuccess={handleSuccess}
+      />
+    </>
   );
 }

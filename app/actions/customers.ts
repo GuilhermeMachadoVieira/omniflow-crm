@@ -11,8 +11,8 @@ export interface CreateCustomerData {
   nome: string;
   email: string;
   image?: string | null;
-  telefone: string;
-  empresa: string;
+  telefone?: string;
+  empresa?: string;
   document?: string;
   address?: string;
   source?: string;

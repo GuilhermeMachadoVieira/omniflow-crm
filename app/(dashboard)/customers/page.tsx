@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/nextauth-client";
-import { CustomersClient } from "@/components/customers/CustomersClient";
+import { CustomersPageClient } from "@/components/customers/CustomersPageClient";
 
 export const dynamic = 'force-dynamic';
 
@@ -17,5 +17,5 @@ export default async function CustomersPage({
   // Extrair termo de busca dos searchParams
   const { q: searchQuery } = await searchParams;
 
-  return <CustomersClient searchQuery={searchQuery} />;
+  return <CustomersPageClient initialSearchQuery={searchQuery} />;
 }

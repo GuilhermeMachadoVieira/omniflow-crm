@@ -21,7 +21,7 @@ export default function DashboardLayout({
         {/* Mobile Sidebar */}
         <MobileSidebar />
         
-        <div className="flex flex-1 flex-col pl-0 md:pl-64">
+        <div className="flex flex-1 flex-col">
           <Header />
           <main className="flex-1 p-6">
             <ErrorBoundary>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -27,6 +27,9 @@ import { Loader2 } from "lucide-react";
 import { createOpportunity } from "@/app/actions/pipeline";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { PipelineColumnSafe } from "@/lib/frontend-types";
+import { getCustomers } from "@/app/actions/customers";
+import { CustomerSafe } from "@/lib/frontend-types";
 
 const opportunitySchema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
@@ -44,23 +47,30 @@ const opportunitySchema = z.object({
 type OpportunityFormData = z.infer<typeof opportunitySchema>;
 
 interface CreateOpportunityDialogProps {
-  children: React.ReactNode;
-  onCreateComplete?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+  columns: PipelineColumnSafe[];
   initialColumnId?: string;
-  customers: Array<{ id: string; nome: string; email: string }>;
-  columns: Array<{ id: string; title: string }>;
 }
 
 export function CreateOpportunityDialog({ 
-  children, 
-  onCreateComplete, 
-  initialColumnId,
-  customers,
-  columns 
+  open, 
+  onOpenChange, 
+  onSuccess,
+  columns,
+  initialColumnId
 }: CreateOpportunityDialogProps) {
-  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [customers, setCustomers] = useState<CustomerSafe[]>([]);
   const router = useRouter();
+
+  // Carregar clientes quando o dialog abrir
+  useEffect(() => {
+    if (open) {
+      getCustomers("").then(setCustomers);
+    }
+  }, [open]);
 
   const form = useForm<OpportunityFormData>({
     resolver: zodResolver(opportunitySchema),
@@ -91,10 +101,9 @@ export function CreateOpportunityDialog({
       if (result.success) {
         toast.success("Oportunidade criada com sucesso!");
         form.reset();
-        setOpen(false);
-        onCreateComplete?.();
-        // Força refresh da página para atualizar o pipeline
-        window.location.reload();
+        onOpenChange(false);
+        onSuccess();
+        router.refresh();
       } else {
         toast.error(result.error || "Erro ao criar oportunidade");
       }
@@ -102,10 +111,7 @@ export function CreateOpportunityDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <DialogHeader>
@@ -222,7 +228,7 @@ export function CreateOpportunityDialog({
                   <SelectValue placeholder="Selecione um cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map((customer) => (
+                  {customers.map((customer: CustomerSafe) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.nome} ({customer.email})
                     </SelectItem>
@@ -266,7 +272,7 @@ export function CreateOpportunityDialog({
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
               Cancelar

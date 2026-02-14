@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/nextauth-client";
-import { PipelineClient } from "@/components/pipeline/PipelineClient";
+import { PipelinePageClient } from "@/components/pipeline/PipelinePageClient";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,9 +18,9 @@ export default async function PipelinePage({
   const { q: searchQuery, priority: priorityFilter } = await searchParams;
 
   return (
-    <PipelineClient 
-      searchQuery={searchQuery}
-      priorityFilter={priorityFilter}
+    <PipelinePageClient 
+      initialSearchQuery={searchQuery}
+      initialPriorityFilter={priorityFilter}
     />
   );
 }
