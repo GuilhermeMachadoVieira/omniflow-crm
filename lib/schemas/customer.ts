@@ -88,10 +88,14 @@ export const customerSchema = z.object({
     .max(255, "E-mail deve ter no máximo 255 caracteres")
     .transform(val => val.toLowerCase().trim()),
   
-  image: z.string()
-    .url("URL da imagem inválida")
+  image: z
+    .union([
+      z.string().url("URL da imagem inválida"),
+      z.literal(""),
+    ])
     .optional()
-    .nullable(),
+    .nullable()
+    .transform((val) => (val === "" || val == null ? null : val)),
   
   telefone: z.string()
     .optional()

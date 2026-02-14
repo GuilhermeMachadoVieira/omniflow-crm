@@ -51,6 +51,7 @@ interface CreateOpportunityDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   columns: PipelineColumnSafe[];
+  organizationId: string;
   initialColumnId?: string;
 }
 
@@ -59,6 +60,7 @@ export function CreateOpportunityDialog({
   onOpenChange, 
   onSuccess,
   columns,
+  organizationId,
   initialColumnId
 }: CreateOpportunityDialogProps) {
   const [isPending, startTransition] = useTransition();
@@ -67,10 +69,10 @@ export function CreateOpportunityDialog({
 
   // Carregar clientes quando o dialog abrir
   useEffect(() => {
-    if (open) {
-      getCustomers("").then(setCustomers);
+    if (open && organizationId) {
+      getCustomers(organizationId).then(setCustomers);
     }
-  }, [open]);
+  }, [open, organizationId]);
 
   const form = useForm<OpportunityFormData>({
     resolver: zodResolver(opportunitySchema),

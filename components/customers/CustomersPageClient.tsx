@@ -13,10 +13,11 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 
 interface CustomersPageClientProps {
+  organizationId: string;
   initialSearchQuery?: string;
 }
 
-export function CustomersPageClient({ initialSearchQuery }: CustomersPageClientProps) {
+export function CustomersPageClient({ organizationId, initialSearchQuery }: CustomersPageClientProps) {
   const [customers, setCustomers] = useState<CustomerSafe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -32,7 +33,7 @@ export function CustomersPageClient({ initialSearchQuery }: CustomersPageClientP
   useEffect(() => {
     const loadCustomers = async () => {
       try {
-        const data = await getCustomers("", searchQuery);
+        const data = await getCustomers(organizationId, searchQuery);
         setCustomers(data);
       } catch (error) {
         console.error("Failed to load customers:", error);
@@ -43,7 +44,7 @@ export function CustomersPageClient({ initialSearchQuery }: CustomersPageClientP
     };
 
     loadCustomers();
-  }, [searchQuery]);
+  }, [organizationId, searchQuery]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -51,7 +52,7 @@ export function CustomersPageClient({ initialSearchQuery }: CustomersPageClientP
 
   const handleCustomerCreated = () => {
     // Recarregar dados quando um cliente for criado
-    getCustomers("", searchQuery).then(setCustomers);
+    getCustomers(organizationId, searchQuery).then(setCustomers);
     setShowCreateDialog(false);
     toast.success("Cliente criado com sucesso!");
   };
@@ -59,7 +60,7 @@ export function CustomersPageClient({ initialSearchQuery }: CustomersPageClientP
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const result = await exportCustomers("");
+      const result = await exportCustomers(organizationId);
       if (result.success && result.data) {
         // Criar blob e download
         const blob = new Blob([result.data], { type: "text/csv" });

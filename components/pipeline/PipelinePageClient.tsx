@@ -12,11 +12,12 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
 
 interface PipelinePageClientProps {
+  organizationId: string;
   initialSearchQuery?: string;
   initialPriorityFilter?: string;
 }
 
-export function PipelinePageClient({ initialSearchQuery, initialPriorityFilter }: PipelinePageClientProps) {
+export function PipelinePageClient({ organizationId, initialSearchQuery, initialPriorityFilter }: PipelinePageClientProps) {
   const [columns, setColumns] = useState<PipelineColumnSafe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -29,7 +30,7 @@ export function PipelinePageClient({ initialSearchQuery, initialPriorityFilter }
   useEffect(() => {
     const loadPipelineData = async () => {
       try {
-        const data = await getPipelineData("", filters.priority);
+        const data = await getPipelineData(organizationId, undefined, filters.priority);
         setColumns(data);
       } catch (error) {
         console.error("Failed to load pipeline data:", error);
@@ -40,7 +41,7 @@ export function PipelinePageClient({ initialSearchQuery, initialPriorityFilter }
     };
 
     loadPipelineData();
-  }, [filters]);
+  }, [organizationId, filters]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -48,7 +49,7 @@ export function PipelinePageClient({ initialSearchQuery, initialPriorityFilter }
 
   const handleOpportunityCreated = () => {
     // Recarregar dados quando uma oportunidade for criada
-    getPipelineData("", filters.priority).then(setColumns);
+    getPipelineData(organizationId, undefined, filters.priority).then(setColumns);
     setShowCreateDialog(false);
     toast.success("Oportunidade criada com sucesso!");
   };
@@ -113,6 +114,7 @@ export function PipelinePageClient({ initialSearchQuery, initialPriorityFilter }
         onOpenChange={setShowCreateDialog}
         onSuccess={handleOpportunityCreated}
         columns={columns}
+        organizationId={organizationId}
       />
     </div>
   );

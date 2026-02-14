@@ -19,6 +19,7 @@ export default async function PipelinePage({
 
   return (
     <PipelinePageClient 
+      organizationId={user.organizationId}
       initialSearchQuery={searchQuery}
       initialPriorityFilter={priorityFilter}
     />

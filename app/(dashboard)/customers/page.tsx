@@ -17,5 +17,10 @@ export default async function CustomersPage({
   // Extrair termo de busca dos searchParams
   const { q: searchQuery } = await searchParams;
 
-  return <CustomersPageClient initialSearchQuery={searchQuery} />;
+  return (
+    <CustomersPageClient
+      organizationId={user.organizationId}
+      initialSearchQuery={searchQuery}
+    />
+  );
 }

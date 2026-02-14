@@ -81,11 +81,14 @@ export function CreateCustomerDialog({ open, onOpenChange, onSuccess }: CreateCu
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     form.handleSubmit(onSubmit)(e);
   };
 
   const handleImageChange = (newUrl?: string) => {
-    setCustomerImage(newUrl || null);
+    const value = newUrl || null;
+    setCustomerImage(value);
+    form.setValue("image", value ?? "", { shouldValidate: true });
   };
 
   return (
