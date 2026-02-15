@@ -103,6 +103,7 @@ export function DashboardClient() {
         <OverviewCard
           title="Clientes Ativos"
           value={metrics.totalCustomers}
+          formatAs="number"
           change={metrics.totalCustomers > 0 ? 12 : 0}
           changeType={metrics.totalCustomers > 0 ? "increase" : undefined}
           icon={<User className="h-8 w-8 text-primary" />}
@@ -111,6 +112,7 @@ export function DashboardClient() {
         <OverviewCard
           title="Oportunidades"
           value={metrics.totalOpportunities}
+          formatAs="number"
           icon={<div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
             <BarChart3 className="h-5 w-5 text-blue-600" />
           </div>}
@@ -119,6 +121,7 @@ export function DashboardClient() {
         <OverviewCard
           title="Vendas Recentes"
           value={metrics.recentSales.length}
+          formatAs="number"
           icon={<div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
             <Trophy className="h-5 w-5 text-green-600" />
           </div>}

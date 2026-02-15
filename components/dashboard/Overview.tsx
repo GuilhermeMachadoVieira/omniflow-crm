@@ -10,6 +10,7 @@ interface OverviewCardProps {
   changeType?: "increase" | "decrease";
   icon: React.ReactNode;
   description: string;
+  formatAs?: "currency" | "number" | "percentage";
 }
 
 export function OverviewCard({ 
@@ -18,14 +19,28 @@ export function OverviewCard({
   change, 
   changeType, 
   icon, 
-  description 
+  description,
+  formatAs = "currency" // Default como moeda para compatibilidade
 }: OverviewCardProps) {
-  const formatValue = (val: string | number) => {
+  const formatValue = (val: string | number, format: string) => {
     if (typeof val === 'number') {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(val);
+      switch (format) {
+        case 'currency':
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }).format(val);
+        case 'number':
+          return new Intl.NumberFormat('pt-BR').format(val);
+        case 'percentage':
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          }).format(val / 100);
+        default:
+          return new Intl.NumberFormat('pt-BR').format(val);
+      }
     }
     return val;
   };
@@ -53,7 +68,7 @@ export function OverviewCard({
       </CardHeader>
       <CardContent>
         <div className="flex items-center space-x-2">
-          <div className="text-2xl font-bold">{formatValue(value)}</div>
+          <div className="text-2xl font-bold">{formatValue(value, formatAs)}</div>
           {icon}
         </div>
         <CardDescription className="text-xs">
