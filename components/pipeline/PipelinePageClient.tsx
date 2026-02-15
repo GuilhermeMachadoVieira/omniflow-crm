@@ -61,7 +61,7 @@ export function PipelinePageClient({ organizationId, initialSearchQuery, initial
   }
 
   return (
-    <div className="space-y-6 h-full flex flex-col overflow-hidden">
+    <div className="space-y-6 h-full flex flex-col overflow-hidden scrollbar-custom">
       {/* Header */}
       <div className="flex-shrink-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

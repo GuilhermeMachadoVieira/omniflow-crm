@@ -142,7 +142,7 @@ export function PipelineBoard({ columns: initialColumns }: PipelineBoardProps) {
       onDragEnd={handleDragEnd}
     >
       <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-x-auto overflow-y-hidden pb-6">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden pb-6 scrollbar-kanban">
           <div className="flex gap-6 h-full min-w-max">
             {columns.map((column) => (
               <BoardColumn

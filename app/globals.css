@@ -135,3 +135,89 @@
     transform: scale(1);
   }
 }
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  .scrollbar-custom {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 5px;
+    transition: background var(--duration-normal);
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  
+  /* Scrollbar for kanban boards */
+  .scrollbar-kanban {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+  }
+  
+  .scrollbar-kanban::-webkit-scrollbar {
+    height: 16px !important;
+    width: 16px !important;
+  }
+  
+  .scrollbar-kanban::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.3);
+    border-radius: 6px;
+    margin: 0 8px;
+  }
+  
+  .scrollbar-kanban::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.6) !important;
+    border-radius: 6px !important;
+    transition: all var(--duration-normal) !important;
+  }
+  
+  .scrollbar-kanban::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.9) !important;
+  }
+  
+  .scrollbar-kanban::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  
+  /* Scrollbar for columns */
+  .scrollbar-column {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  
+  .scrollbar-column::-webkit-scrollbar {
+    width: 12px !important;
+  }
+  
+  .scrollbar-column::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-column::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+    transition: background var(--duration-normal);
+  }
+  
+  .scrollbar-column::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
