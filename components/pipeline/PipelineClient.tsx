@@ -14,15 +14,19 @@ import { CustomerSafe } from "@/lib/frontend-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPipelineData } from "@/app/actions/pipeline";
 import { getCustomers } from "@/app/actions/customers";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface PipelineClientProps {
+  organizationId?: string;
   initialColumns?: PipelineColumnSafe[];
   initialCustomers?: CustomerSafe[];
   searchQuery?: string;
   priorityFilter?: string;
 }
 
-export function PipelineClient({ initialColumns, initialCustomers, searchQuery, priorityFilter }: PipelineClientProps) {
+export function PipelineClient({ organizationId: organizationIdProp, initialColumns, initialCustomers, searchQuery, priorityFilter }: PipelineClientProps) {
+  const { user } = useCurrentUser();
+  const organizationId = organizationIdProp ?? user?.organizationId ?? "";
   const [columns, setColumns] = useState<PipelineColumnSafe[]>(initialColumns || []);
   const [customers, setCustomers] = useState<CustomerSafe[]>(initialCustomers || []);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,13 +42,17 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
 
     const loadData = async () => {
       if (!initialColumns || !initialCustomers) {
+        if (!organizationId) {
+          setIsLoading(false);
+          return;
+        }
         setIsLoading(true);
         try {
           const [columnsData, customersData] = await Promise.all([
-            getPipelineData("", searchQuery, priorityFilter),
-            getCustomers("")
+            getPipelineData(organizationId, searchQuery, priorityFilter),
+            getCustomers(organizationId)
           ]);
-          
+
           if (columnsData) setColumns(columnsData);
           if (customersData) setCustomers(customersData);
         } catch (error) {
@@ -56,7 +64,7 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
     };
 
     loadData();
-  }, [initialColumns, initialCustomers, searchQuery, priorityFilter]);
+  }, [organizationId, initialColumns, initialCustomers, searchQuery, priorityFilter]);
 
   const handleCreateComplete = () => {
     // A lista será atualizada pelo router.refresh() no dialog
@@ -107,6 +115,7 @@ export function PipelineClient({ initialColumns, initialCustomers, searchQuery, 
           />
           <Suspense fallback={null}>
             <LazyCreateOpportunityDialog 
+              organizationId={organizationId}
               customers={customers} 
               columns={columns}
               onCreateComplete={handleCreateComplete}

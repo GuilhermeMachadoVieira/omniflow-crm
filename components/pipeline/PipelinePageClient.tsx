@@ -48,10 +48,8 @@ export function PipelinePageClient({ organizationId, initialSearchQuery, initial
   };
 
   const handleOpportunityCreated = () => {
-    // Recarregar dados quando uma oportunidade for criada
     getPipelineData(organizationId, undefined, filters.priority).then(setColumns);
     setShowCreateDialog(false);
-    toast.success("Oportunidade criada com sucesso!");
   };
 
   if (isLoading) {

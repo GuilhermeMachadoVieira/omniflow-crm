@@ -17,14 +17,8 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const identifier = getClientIdentifier(request);
 
-  console.log('=== MIDDLEWARE DEBUG ===');
-  console.log('Path:', path);
-  console.log('Method:', request.method);
-  console.log('Identifier:', identifier);
-
   // Ignorar preflight
   if (request.method === "OPTIONS") {
-    console.log('Ignoring OPTIONS request');
     return NextResponse.next();
   }
 
@@ -64,12 +58,8 @@ export async function middleware(request: NextRequest) {
   // Verifica se a rota atual está na lista de públicas
   const isPublicPath = PUBLIC_PATHS.includes(path);
   const isPublicPrefix = PUBLIC_PREFIXES.some((prefix) => path.startsWith(prefix));
-  
-  console.log('Is public path:', isPublicPath);
-  console.log('Is public prefix:', isPublicPrefix);
-  
+
   if (isPublicPrefix) {
-    console.log('Allowing public prefix');
     return NextResponse.next();
   }
 

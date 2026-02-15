@@ -87,7 +87,6 @@ export function CreateOpportunityDialog({
     },
   });
 
-  // @ts-no-check
   async function onSubmit(data: OpportunityFormData) {
     startTransition(async () => {
       const result = await createOpportunity({

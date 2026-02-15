@@ -51,10 +51,8 @@ export function CustomersPageClient({ organizationId, initialSearchQuery }: Cust
   };
 
   const handleCustomerCreated = () => {
-    // Recarregar dados quando um cliente for criado
     getCustomers(organizationId, searchQuery).then(setCustomers);
     setShowCreateDialog(false);
-    toast.success("Cliente criado com sucesso!");
   };
 
   const handleExport = async () => {

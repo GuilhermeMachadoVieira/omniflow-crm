@@ -13,11 +13,12 @@ export interface LazyCreateOpportunityDialogProps {
   children: React.ReactNode;
   onCreateComplete?: () => void;
   initialColumnId?: string;
+  organizationId: string;
   customers: CustomerSafe[];
   columns: PipelineColumnSafe[] | Array<{ id: string; title: string }>;
 }
 
-export function LazyCreateOpportunityDialog({ children, onCreateComplete, initialColumnId, customers, columns }: LazyCreateOpportunityDialogProps) {
+export function LazyCreateOpportunityDialog({ children, onCreateComplete, initialColumnId, organizationId, customers, columns }: LazyCreateOpportunityDialogProps) {
   const [open, setOpen] = useState(false);
 
   const handleSuccess = () => {
@@ -35,6 +36,7 @@ export function LazyCreateOpportunityDialog({ children, onCreateComplete, initia
         onOpenChange={setOpen}
         onSuccess={handleSuccess}
         initialColumnId={initialColumnId}
+        organizationId={organizationId}
         columns={Array.isArray(columns) && columns.length > 0 && 'id' in columns[0] ? columns as PipelineColumnSafe[] : columns.map(col => ({ id: col.id, title: col.title, sortOrder: 0, opportunities: [], organizationId: '', createdAt: new Date() }))}
       />
     </>
