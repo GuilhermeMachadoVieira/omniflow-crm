@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building, Eye, ExternalLink } from "lucide-react";
+import { Phone, Mail, Building, Eye, ExternalLink, Users } from "lucide-react";
 import { CustomerSafe } from "@/lib/frontend-types";
 import { getInitials } from "@/lib/utils";
 import Link from "next/link";
@@ -25,7 +25,9 @@ export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) 
     return (
       <div className="text-center py-12">
         <div className="mx-auto max-w-sm">
-          <div className="text-4xl mb-4">👥</div>
+          <div className="text-4xl mb-4 text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto" />
+          </div>
           <h3 className="text-lg font-medium mb-2">Nenhum cliente encontrado</h3>
           <p className="text-muted-foreground">
             Comece adicionando seu primeiro cliente para gerenciar seu relacionamento com eles.

@@ -8,7 +8,7 @@ import { RecentSales } from "@/components/dashboard/RecentSales";
 import { DateFilters } from "@/components/dashboard/DateFilters";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { getDashboardMetrics } from "@/app/actions/dashboard";
-import { User, Plus, TrendingUp } from "lucide-react";
+import { User, Plus, TrendingUp, DollarSign, BarChart3, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -56,18 +56,18 @@ export function DashboardClient() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+      <div className="flex items-center justify-between gap-lg">
+        <div className="space-y-sm">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Dashboard
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             Visão geral do seu pipeline e desempenho de vendas.
           </p>
         </div>
         
         {/* Quick Actions */}
-        <div className="flex gap-2">
+        <div className="flex gap-sm">
           <Link href="/customers">
             <Button variant="outline">
               <Plus className="mr-2 h-4 w-4" />
@@ -91,12 +91,12 @@ export function DashboardClient() {
       />
 
       {/* Cards de Métricas */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-xl md:grid-cols-2 lg:grid-cols-4">
         <OverviewCard
           title="Receita Total"
           value={metrics.totalRevenue}
           icon={<div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <span className="text-primary">💰</span>
+            <DollarSign className="h-5 w-5 text-primary" />
           </div>}
           description="Soma de todas as oportunidades fechadas"
         />
@@ -112,7 +112,7 @@ export function DashboardClient() {
           title="Oportunidades"
           value={metrics.totalOpportunities}
           icon={<div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-            <span className="text-blue-600">📊</span>
+            <BarChart3 className="h-5 w-5 text-blue-600" />
           </div>}
           description="Total de oportunidades no pipeline"
         />
@@ -120,7 +120,7 @@ export function DashboardClient() {
           title="Vendas Recentes"
           value={metrics.recentSales.length}
           icon={<div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-            <span className="text-green-600">🏆</span>
+            <Trophy className="h-5 w-5 text-green-600" />
           </div>}
           description="Oportunidades fechadas recentemente"
         />
@@ -128,16 +128,16 @@ export function DashboardClient() {
 
       {/* Gráfico de Receita Mensal */}
       {metrics.monthlyRevenue && metrics.monthlyRevenue.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-4">Receita Mensal</h2>
-          <div className="rounded-lg border bg-card p-6">
+        <div className="space-y-lg">
+          <h2 className="text-xl font-semibold text-foreground">Receita Mensal</h2>
+          <div className="rounded-lg border bg-card p-xl">
             <RevenueChart data={metrics.monthlyRevenue} />
           </div>
         </div>
       )}
 
       {/* Vendas Recentes */}
-      <div className="mt-8">
+      <div className="space-y-lg">
         <RecentSales sales={metrics.recentSales} />
       </div>
 

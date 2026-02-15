@@ -16,16 +16,16 @@ export function Header({ title, description, className, children }: HeaderProps)
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b border-border bg-card/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-card/80",
+        "sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 transition-all duration-normal",
         className
       )}
     >
       <div className="flex flex-1 items-center gap-4">
         {title && (
-          <div className="flex flex-col">
-            <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+          <div className="flex flex-col animate-slide-up">
+            <h1 className="text-lg font-semibold text-foreground transition-colors duration-normal">{title}</h1>
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-xs text-muted-foreground transition-colors duration-normal">{description}</p>
             )}
           </div>
         )}
@@ -33,14 +33,19 @@ export function Header({ title, description, className, children }: HeaderProps)
       </div>
       <div className="flex items-center gap-2">
         <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors duration-normal" />
           <Input
             placeholder="Buscar..."
-            className="w-64 pl-9"
+            className="w-64 pl-9 transition-all duration-normal focus:w-72 focus:shadow-sm"
           />
         </div>
-        <Button variant="ghost" size="icon" aria-label="Notificações">
-          <Bell className="h-5 w-5" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          aria-label="Notificações"
+          className="transition-all duration-normal hover:scale-110 active:scale-95"
+        >
+          <Bell className="h-5 w-5 transition-transform duration-normal hover:rotate-12" />
         </Button>
       </div>
     </header>
