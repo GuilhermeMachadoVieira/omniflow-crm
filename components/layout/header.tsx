@@ -19,8 +19,11 @@ export function Header({ title, description, className, children }: HeaderProps)
         "sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 transition-all duration-normal",
         className
       )}
+      style={{
+        width: 'calc(100vw - 64px)' // Largura fixa quando sidebar está expandida
+      }}
     >
-      <div className="flex flex-1 items-center gap-4">
+      <div className="flex items-center gap-4">
         {title && (
           <div className="flex flex-col animate-slide-up">
             <h1 className="text-lg font-semibold text-foreground transition-colors duration-normal">{title}</h1>
