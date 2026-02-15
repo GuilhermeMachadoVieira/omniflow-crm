@@ -141,16 +141,20 @@ export function PipelineBoard({ columns: initialColumns }: PipelineBoardProps) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-6 overflow-x-auto pb-6">
-        {columns.map((column) => (
-          <BoardColumn
-            key={column.id}
-            stageId={column.id}
-            title={column.title}
-            opportunities={column.opportunities}
-            total={getColumnTotal(column.opportunities)}
-          />
-        ))}
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden pb-6">
+          <div className="flex gap-6 h-full min-w-max">
+            {columns.map((column) => (
+              <BoardColumn
+                key={column.id}
+                stageId={column.id}
+                title={column.title}
+                opportunities={column.opportunities}
+                total={getColumnTotal(column.opportunities)}
+              />
+            ))}
+          </div>
+        </div>
       </div>
       <DragOverlay>
         {activeOpportunity ? (

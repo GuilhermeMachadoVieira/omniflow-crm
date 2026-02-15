@@ -9,13 +9,10 @@ export function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div 
       className={cn(
-        "flex flex-1 flex-col transition-all duration-300",
+        "flex flex-1 flex-col transition-all duration-300 min-h-screen overflow-hidden",
         "md:ml-64", // Margin quando sidebar está expandida
         isCollapsed && "md:ml-16" // Margin quando sidebar está recolhida
       )}
-      style={{
-        marginLeft: isCollapsed ? '4rem' : '16rem' // 64px / 16px = 4rem / 16rem
-      }}
     >
       {children}
     </div>

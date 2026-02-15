@@ -26,7 +26,7 @@ export default function DashboardLayout({
           
           <DashboardContent>
             <Header />
-            <main className="flex-1 p-6">
+            <main className="flex-1 p-6 min-h-0 overflow-hidden">
               <ErrorBoundary>
                 {children}
               </ErrorBoundary>

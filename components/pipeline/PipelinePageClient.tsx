@@ -61,49 +61,55 @@ export function PipelinePageClient({ organizationId, initialSearchQuery, initial
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Pipeline de Vendas
-          </h1>
-          <p className="text-muted-foreground">
-            Gerencie suas oportunidades de negócio em cada etapa do funil.
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filtros
-          </Button>
+      <div className="flex-shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Pipeline de Vendas
+            </h1>
+            <p className="text-muted-foreground">
+              Gerencie suas oportunidades de negócio em cada etapa do funil.
+            </p>
+          </div>
           
-          <Button
-            onClick={() => setShowCreateDialog(true)}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Nova Oportunidade
-          </Button>
+          <div className="flex flex-shrink-0 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              <span className="hidden sm:inline">Filtros</span>
+            </Button>
+            
+            <Button
+              onClick={() => setShowCreateDialog(true)}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Nova Oportunidade</span>
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Filtros */}
       {showFilters && (
-        <PipelineFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <div className="flex-shrink-0">
+          <PipelineFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
       )}
 
-      {/* Pipeline Board */}
-      <div className="bg-background rounded-lg border p-6">
-        <PipelineBoard columns={columns} />
+      {/* Pipeline Board Container */}
+      <div className="flex-1 min-h-0 bg-background rounded-lg border overflow-hidden">
+        <div className="h-full p-6 overflow-hidden">
+          <PipelineBoard columns={columns} />
+        </div>
       </div>
 
       {/* Dialog de Criação */}
