@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getInitials } from "@/lib/utils";
 
 interface RecentSalesProps {
   sales: Array<{
@@ -19,15 +19,6 @@ interface RecentSalesProps {
 export function RecentSales({ sales }: RecentSalesProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('pt-BR').format(date);
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((word: string) => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   if (sales.length === 0) {

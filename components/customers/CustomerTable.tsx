@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, Building, Eye, ExternalLink } from "lucide-react";
 import { CustomerSafe } from "@/lib/frontend-types";
+import { getInitials } from "@/lib/utils";
 import Link from "next/link";
 
 interface CustomerTableProps {
@@ -19,14 +20,6 @@ interface CustomerTableProps {
 }
 
 export function CustomerTable({ customers, onViewDetails }: CustomerTableProps) {
-  function getInitials(nome: string) {
-    return nome
-      .split(" ")
-      .map((word: string) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  }
 
   if (customers.length === 0) {
     return (

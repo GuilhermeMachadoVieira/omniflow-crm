@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { getInitials } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -39,15 +40,6 @@ export function MobileSidebar() {
   const { user } = useCurrentUser();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word: string) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const isActive = (href: string) => {
     return pathname === href || pathname.startsWith(`${href}/`);

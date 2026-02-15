@@ -11,3 +11,12 @@ export function formatCurrency(value: number): string {
     currency: 'BRL',
   }).format(value);
 }
+
+export function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((word: string) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}

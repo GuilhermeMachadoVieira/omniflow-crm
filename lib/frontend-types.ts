@@ -65,14 +65,6 @@ export type CustomerPrisma = {
   status?: string;
 };
 
-export type TeamMemberPrisma = {
-  id: string;
-  nome: string;
-  email: string;
-  role: string;
-  createdAt: Date;
-};
-
 export type OpportunityPrisma = {
   id: string;
   title: string;
@@ -110,16 +102,6 @@ export function sanitizeCustomer(customer: any): CustomerSafe {
     totalRevenue: customer.totalRevenue ? Number(customer.totalRevenue) : undefined,
     lastPurchaseDate: customer.lastPurchaseDate ? customer.lastPurchaseDate.toISOString() : undefined,
     status: customer.status || undefined,
-  };
-}
-
-export function sanitizeTeamMember(member: any): TeamMemberSafe {
-  return {
-    id: member.id,
-    nome: member.nome,
-    email: member.email,
-    role: member.role,
-    createdAt: member.createdAt.toISOString(),
   };
 }
 

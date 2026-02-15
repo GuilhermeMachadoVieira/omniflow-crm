@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Phone, Mail, MessageSquare, Calendar } from "lucide-react";
+import { getInitials } from "@/lib/utils";
 
 interface Activity {
   id: string;
@@ -53,15 +54,6 @@ function formatRelativeTime(dateString: string) {
   if (diffMins < 60) return `Há ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
   if (diffHours < 24) return `Há ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
   return `Há ${diffDays} dia${diffDays > 1 ? 's' : ''}`;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 }
 
 export function ActivityFeed({ activities }: ActivityFeedProps) {

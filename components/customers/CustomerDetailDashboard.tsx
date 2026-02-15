@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerSafe } from "@/lib/frontend-types";
+import { getInitials } from "@/lib/utils";
 import { CustomerInfoCard } from "./CustomerInfoCard";
 import { CustomerOpportunitiesCard } from "./CustomerOpportunitiesCard";
 import { AddActivityForm } from "../activities/AddActivityForm";
@@ -43,15 +44,6 @@ interface CustomerDetailDashboardProps {
 
 export function CustomerDetailDashboard({ customer }: CustomerDetailDashboardProps) {
   const router = useRouter();
-  
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const handleUpdateComplete = () => {
     router.refresh();

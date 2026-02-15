@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getInitials } from "@/lib/utils";
 
 interface TeamMember {
   id: string;
@@ -140,15 +141,6 @@ export function TeamManagement() {
       default:
         return "Membro";
     }
-  }
-
-  function getInitials(name: string): string {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
   }
 
   return (

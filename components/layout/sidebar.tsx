@@ -13,7 +13,7 @@ import {
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -23,15 +23,6 @@ export function Sidebar() {
   const { user } = useCurrentUser();
   const pathname = usePathname();
   const router = useRouter();
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word: string) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const handleLogout = async () => {
     try {

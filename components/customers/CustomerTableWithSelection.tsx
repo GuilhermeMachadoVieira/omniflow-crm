@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Phone, Mail, Building, Eye, ExternalLink, Trash2 } from "lucide-react";
 import { CustomerSafe } from "@/lib/frontend-types";
+import { getInitials } from "@/lib/utils";
 import Link from "next/link";
 
 interface CustomerTableWithSelectionProps {
@@ -27,14 +28,6 @@ export function CustomerTableWithSelection({
   onSelectionChange,
   onViewDetails 
 }: CustomerTableWithSelectionProps) {
-  function getInitials(nome: string) {
-    return nome
-      .split(" ")
-      .map((word: string) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {

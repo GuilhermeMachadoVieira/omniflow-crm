@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TeamMemberSafe } from "@/lib/frontend-types";
+import { getInitials } from "@/lib/utils";
 
 interface TeamTableProps {
   members: TeamMemberSafe[];
@@ -39,15 +40,6 @@ export function TeamTable({ members }: TeamTableProps) {
       default:
         return role;
     }
-  }
-
-  function getInitials(nome: string) {
-    return nome
-      .split(" ")
-      .map((word: string) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
   }
 
   if (members.length === 0) {
