@@ -14,14 +14,14 @@ export default function DashboardLayout({
     <UserProvider>
       <div className="flex min-h-screen bg-background">
         {/* Desktop Sidebar */}
-        <div className="hidden md:block">
+        <div className="hidden md:block fixed left-0 top-0 h-full">
           <Sidebar />
         </div>
         
         {/* Mobile Sidebar */}
         <MobileSidebar />
         
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col md:ml-64">
           <Header />
           <main className="flex-1 p-6">
             <ErrorBoundary>

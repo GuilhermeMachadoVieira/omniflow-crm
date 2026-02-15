@@ -75,8 +75,8 @@ const navigation: NavigationItem[] = [
   ];
 
   return (
-    <div className="flex h-full w-64 flex-col">
-      <div className="flex items-center gap-4 p-4 border-b">
+    <div className="flex h-screen w-64 flex-col z-40">
+      <div className="flex items-center gap-4 p-4 border-b shrink-0">
         <Avatar className="h-10 w-10">
           {user?.image ? (
             <AvatarImage src={user.image} alt={user.nome} />
@@ -92,7 +92,7 @@ const navigation: NavigationItem[] = [
         </div>
       </div>
 
-      <nav className="flex-1 px-4 py-6">
+      <nav className="flex-1 px-4 py-6 overflow-y-auto">
         <ul className="space-y-2">
           {navigation.map((item) => {
             const canViewItem = !item.requiredRole || (user && item.requiredRole.includes(user.role));
@@ -116,7 +116,7 @@ const navigation: NavigationItem[] = [
         </ul>
       </nav>
 
-      <div className="mt-auto p-4 border-t">
+      <div className="mt-auto p-4 border-t shrink-0">
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground w-full text-left p-2 rounded-lg hover:bg-accent transition-colors"

@@ -1,37 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, Users, Building2, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { getInitials } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { signOut } from "next-auth/react";
 
 const navigation = [
   {
     title: "Dashboard",
     href: "/",
-    icon: "📊",
+    icon: Home,
     requiredRole: null,
   },
   {
     title: "Pipeline",
     href: "/pipeline",
-    icon: "📋",
+    icon: Users,
     requiredRole: null,
   },
   {
     title: "Clientes",
     href: "/customers",
-    icon: "👥",
+    icon: Building2,
     requiredRole: null,
   },
   {
     title: "Configurações",
     href: "/settings",
-    icon: "⚙️",
+    icon: Settings,
     requiredRole: ["OWNER", "ADMIN"],
   },
 ];
@@ -39,7 +42,20 @@ const navigation = [
 export function MobileSidebar() {
   const { user } = useCurrentUser();
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ redirect: false });
+      toast.success("Logout realizado com sucesso!");
+      router.push("/login");
+      router.refresh();
+      setIsOpen(false);
+    } catch (error) {
+      toast.error("Erro ao fazer logout");
+    }
+  };
 
   const isActive = (href: string) => {
     return pathname === href || pathname.startsWith(`${href}/`);
@@ -71,7 +87,7 @@ export function MobileSidebar() {
           <div className="fixed inset-y-0 left-0 z-50 w-64 bg-background md:hidden">
             <div className="flex h-full flex-col">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-4 border-b shrink-0">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     {user?.image ? (
@@ -101,7 +117,7 @@ export function MobileSidebar() {
               </div>
 
               {/* Navigation */}
-              <nav className="flex-1 px-4 py-6">
+              <nav className="flex-1 px-4 py-6 overflow-y-auto">
                 <ul className="space-y-2">
                   {navigation.map((item) => {
                     const canViewItem = !item.requiredRole || (user && item.requiredRole.includes(user.role));
@@ -119,7 +135,7 @@ export function MobileSidebar() {
                               : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
                         >
-                          <span className="text-lg">{item.icon}</span>
+                          <item.icon className="h-5 w-5" />
                           {item.title}
                         </Link>
                       </li>
@@ -127,6 +143,17 @@ export function MobileSidebar() {
                   })}
                 </ul>
               </nav>
+
+              {/* Logout Section */}
+              <div className="mt-auto p-4 border-t shrink-0">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground w-full text-left p-2 rounded-lg hover:bg-accent transition-colors"
+                >
+                  <LogOut className="h-5 w-5" />
+                  Sair
+                </button>
+              </div>
             </div>
           </div>
         </>
