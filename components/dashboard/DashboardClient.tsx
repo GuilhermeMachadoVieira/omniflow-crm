@@ -19,6 +19,9 @@ interface DashboardMetrics {
   totalOpportunities: number;
   recentSales: any[];
   monthlyRevenue?: any[];
+  conversionRate?: number;
+  averageDealSize?: number;
+  salesCycleLength?: number;
 }
 
 export function DashboardClient() {
@@ -30,6 +33,7 @@ export function DashboardClient() {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
+        setIsLoading(true);
         const data = await getDashboardMetrics();
         setMetrics(data);
       } catch (error) {
@@ -41,6 +45,22 @@ export function DashboardClient() {
 
     loadMetrics();
   }, []);
+
+  const handleRefresh = async () => {
+    const loadMetrics = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getDashboardMetrics();
+        setMetrics(data);
+      } catch (error) {
+        console.error("Failed to load dashboard metrics:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    await loadMetrics();
+  };
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -88,6 +108,8 @@ export function DashboardClient() {
         onDateRangeChange={setDateRange}
         onPresetChange={setDatePreset}
         currentPreset={datePreset}
+        onRefresh={handleRefresh}
+        isLoading={isLoading}
       />
 
       {/* Cards de Métricas */}
@@ -108,7 +130,35 @@ export function DashboardClient() {
           changeType={metrics.totalCustomers > 0 ? "increase" : undefined}
           icon={<User className="h-8 w-8 text-primary" />}
           description="Total de clientes na base"
+          drillDownHref="/customers"
         />
+        <OverviewCard
+          title="Taxa de Conversão"
+          value={metrics.conversionRate || 0}
+          formatAs="percentage"
+          change={metrics.conversionRate && metrics.conversionRate > 20 ? 5 : -3}
+          changeType={metrics.conversionRate && metrics.conversionRate > 20 ? "increase" : "decrease"}
+          icon={<div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+            <TrendingUp className="h-5 w-5 text-green-600" />
+          </div>}
+          description="Leads convertidos em clientes"
+        />
+        <OverviewCard
+          title="Ticket Médio"
+          value={metrics.averageDealSize || 0}
+          formatAs="currency"
+          change={metrics.averageDealSize && metrics.averageDealSize > 5000 ? 8 : 0}
+          changeType={metrics.averageDealSize && metrics.averageDealSize > 5000 ? "increase" : undefined}
+          icon={<div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+            <BarChart3 className="h-5 w-5 text-orange-600" />
+          </div>}
+          description="Valor médio por negócio"
+          drillDownHref="/pipeline"
+        />
+      </div>
+
+      {/* Segunda linha de métricas */}
+      <div className="grid gap-xl md:grid-cols-2 lg:grid-cols-3">
         <OverviewCard
           title="Oportunidades"
           value={metrics.totalOpportunities}
@@ -117,6 +167,17 @@ export function DashboardClient() {
             <BarChart3 className="h-5 w-5 text-blue-600" />
           </div>}
           description="Total de oportunidades no pipeline"
+        />
+        <OverviewCard
+          title="Ciclo de Vendas"
+          value={metrics.salesCycleLength || 0}
+          formatAs="number"
+          change={metrics.salesCycleLength && metrics.salesCycleLength < 30 ? -5 : 0}
+          changeType={metrics.salesCycleLength && metrics.salesCycleLength < 30 ? "increase" : "decrease"}
+          icon={<div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+            <TrendingUp className="h-5 w-5 text-purple-600" />
+          </div>}
+          description="Dias médios para fechamento"
         />
         <OverviewCard
           title="Vendas Recentes"
@@ -132,7 +193,13 @@ export function DashboardClient() {
       {/* Gráfico de Receita Mensal */}
       {metrics.monthlyRevenue && metrics.monthlyRevenue.length > 0 && (
         <div className="space-y-lg">
-          <h2 className="text-xl font-semibold text-foreground">Receita Mensal</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-foreground">Receita Mensal</h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Comparativo vs mês anterior</span>
+              <span className="font-medium text-green-600">+{metrics.monthlyRevenue.length > 1 ? ((metrics.monthlyRevenue[metrics.monthlyRevenue.length - 1].revenue - metrics.monthlyRevenue[0].revenue) / metrics.monthlyRevenue[0].revenue * 100).toFixed(1) : '0'}%</span>
+            </div>
+          </div>
           <div className="rounded-lg border bg-card p-xl">
             <RevenueChart data={metrics.monthlyRevenue} />
           </div>

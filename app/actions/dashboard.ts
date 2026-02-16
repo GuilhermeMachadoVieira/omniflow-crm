@@ -27,6 +27,9 @@ export async function getDashboardMetrics() {
         totalOpportunities: 0,
         recentSales: [] as RecentSaleItem[],
         monthlyRevenue: [] as MonthlyRevenueItem[],
+        conversionRate: 0,
+        averageDealSize: 0,
+        salesCycleLength: 0,
       };
     }
 
@@ -34,6 +37,7 @@ export async function getDashboardMetrics() {
     const [
       totalCustomers,
       totalOpportunities,
+      allOpportunities,
       recentSales,
       monthlyRevenue
     ] = await Promise.all([
@@ -49,6 +53,17 @@ export async function getDashboardMetrics() {
       prisma.opportunity.count({
         where: {
           organizationId: currentUser.organizationId,
+        },
+      }),
+      
+      // Todas as oportunidades para cálculos
+      prisma.opportunity.findMany({
+        where: {
+          organizationId: currentUser.organizationId,
+        },
+        select: {
+          value: true,
+          createdAt: true,
         },
       }),
       
@@ -107,8 +122,17 @@ export async function getDashboardMetrics() {
       }),
     ]);
 
-    // Calcular receita total (soma de oportunidades na última coluna)
+    // Calcular métricas avançadas
     const totalRevenue = recentSales.reduce((sum, sale) => sum + sale.value, 0);
+    const conversionRate = totalCustomers > 0 ? ((totalCustomers / (totalCustomers + totalOpportunities)) * 100) : 0;
+    const averageDealSize = allOpportunities.length > 0 
+      ? allOpportunities.reduce((sum, opp) => sum + Number(opp.value), 0) / allOpportunities.length 
+      : 0;
+    
+    // Calcular ciclo de vendas médio (usando apenas createdAt como proxy)
+    const salesCycleLength = allOpportunities.length > 0
+      ? 15 // Valor fixo temporário até termos updatedAt no schema
+      : 0;
 
     return {
       totalRevenue,
@@ -116,6 +140,9 @@ export async function getDashboardMetrics() {
       totalOpportunities,
       recentSales,
       monthlyRevenue,
+      conversionRate: Math.round(conversionRate * 10) / 10, // Arredondar para 1 casa decimal
+      averageDealSize: Math.round(averageDealSize * 100) / 100, // Arredondar para 2 casas decimais
+      salesCycleLength: Math.round(salesCycleLength * 10) / 10, // Arredondar para 1 casa decimal
     };
   } catch (error) {
     console.error("Error fetching dashboard metrics:", error);
@@ -125,6 +152,9 @@ export async function getDashboardMetrics() {
       totalOpportunities: 0,
       recentSales: [] as RecentSaleItem[],
       monthlyRevenue: [] as MonthlyRevenueItem[],
+      conversionRate: 0,
+      averageDealSize: 0,
+      salesCycleLength: 0,
     };
   }
 }

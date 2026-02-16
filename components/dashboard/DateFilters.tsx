@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, RefreshCw } from "lucide-react";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 interface DateRange {
@@ -14,12 +14,16 @@ interface DateFiltersProps {
   onDateRangeChange?: (range: DateRange | undefined) => void;
   onPresetChange?: (preset: string) => void;
   currentPreset?: string;
+  onRefresh?: () => void;
+  isLoading?: boolean;
 }
 
 export function DateFilters({ 
   onDateRangeChange, 
   onPresetChange, 
-  currentPreset 
+  currentPreset,
+  onRefresh,
+  isLoading = false
 }: DateFiltersProps) {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -68,8 +72,8 @@ export function DateFilters({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium">Período:</span>
         
         <Button
@@ -113,6 +117,17 @@ export function DateFilters({
           placeholder="Personalizado"
           className="w-64"
         />
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefresh}
+          disabled={isLoading}
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Atualizar
+        </Button>
       </div>
     </div>
   );

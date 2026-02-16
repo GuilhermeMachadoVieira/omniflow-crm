@@ -29,7 +29,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
         <YAxis 
           tick={{ fontSize: 12 }}
           tickLine={false}
-          tickFormatter={(value) => `R$ ${value / 1000}k`}
+          tickFormatter={(value) => {
+            if (value >= 1000000) {
+              return `R$ ${(value / 1000000).toFixed(1)}M`;
+            } else if (value >= 1000) {
+              return `R$ ${(value / 1000).toFixed(1)}k`;
+            }
+            return `R$ ${value}`;
+          }}
         />
         <Tooltip 
           formatter={(value) => formatCurrency(Number(value))}

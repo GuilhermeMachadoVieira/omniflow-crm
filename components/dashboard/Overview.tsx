@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Users, DollarSign } from "lucide-react";
+import Link from "next/link";
 
 interface OverviewCardProps {
   title: string;
@@ -11,6 +12,8 @@ interface OverviewCardProps {
   icon: React.ReactNode;
   description: string;
   formatAs?: "currency" | "number" | "percentage";
+  onClick?: () => void;
+  drillDownHref?: string;
 }
 
 export function OverviewCard({ 
@@ -20,7 +23,9 @@ export function OverviewCard({
   changeType, 
   icon, 
   description,
-  formatAs = "currency" // Default como moeda para compatibilidade
+  formatAs = "currency", // Default como moeda para compatibilidade
+  onClick,
+  drillDownHref
 }: OverviewCardProps) {
   const formatValue = (val: string | number, format: string) => {
     if (typeof val === 'number') {
@@ -45,8 +50,14 @@ export function OverviewCard({
     return val;
   };
 
-  return (
-    <Card>
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
+  const cardContent = (
+    <>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div className="flex items-center space-x-2">
@@ -75,6 +86,29 @@ export function OverviewCard({
           {description}
         </CardDescription>
       </CardContent>
+    </>
+  );
+
+  if (drillDownHref) {
+    return (
+      <Link 
+        href={drillDownHref}
+        className="block transition-transform hover:scale-105"
+        onClick={handleClick}
+      >
+        <Card>
+          {cardContent}
+        </Card>
+      </Link>
+    );
+  }
+
+  return (
+    <Card 
+      className={`transition-transform hover:scale-105 ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={handleClick}
+    >
+      {cardContent}
     </Card>
   );
 }
